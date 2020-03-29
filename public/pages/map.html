@@ -1,0 +1,35 @@
+<html>
+
+<head>
+
+</head>
+
+<body>
+    <h1>this is the page with the map</h1>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLMI60gh3A2gk8NGXtsB8_HUymue0ERpU&libraries=places&callback=initMap"></script>
+    <script>
+        function callback(response, status) {
+            let res = document.createElement("p");
+            let json = response;
+            res.innerText = JSON.stringify(json["rows"][0]["elements"][0]);
+            document.getElementsByTagName("BODY")[0].appendChild(res);
+        }
+        navigator.geolocation.getCurrentPosition(function(location) {
+            let originLong = location.coords.longitude;
+            let originLat = location.coords.latitude;
+            let destinationLat = 47.1586425;
+            let destinationLong = 27.5940294;
+            let origin = new google.maps.LatLng(originLat, originLong);
+            let destination = new google.maps.LatLng(destinationLat, destinationLong);
+            let service = new google.maps.DistanceMatrixService();
+            service.getDistanceMatrix({
+                origins: [origin],
+                destinations: [destination],
+                travelMode: 'WALKING',
+            }, callback);
+        });
+    </script>
+
+</body>
+
+</html>
