@@ -1,0 +1,107 @@
+<html>
+<head>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+      
+        function authenticate() {
+          return gapi.auth2.getAuthInstance()
+              .signIn({scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events"})
+              .then(function() { console.log("Sign-in successful"); },
+                    function(err) { console.error("Error signing in", err); });
+        }
+
+        function loadClient() {
+          gapi.client.setApiKey('AIzaSyCLMI60gh3A2gk8NGXtsB8_HUymue0ERpU');
+          return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/calendar/v3/rest")
+            .then(function() { 
+                console.log("GAPI client loaded for API");
+                var authButton = document.getElementById("authBtn").setAttribute("hidden", "hidden");
+                var submitBtn = document.getElementById("submitBtn").removeAttribute("hidden"); 
+            },
+            function(err) { console.error("Error loading GAPI client for API", err); });
+        }
+
+        function checkAvailability() {
+            var returnedMessage = document.getElementById("returnedMessage");
+            var dateSelect = document.getElementById("dates");
+            var eventDate = new Date(dateSelect.options[dateSelect.selectedIndex].text);  
+            var eventStartTime = new Date(eventDate);
+            var eventEndTime = new Date (eventDate);
+            eventEndTime.setMinutes(eventEndTime.getMinutes() + 60);
+            console.log(eventStartTime);
+            console.log(eventEndTime);
+            
+            return gapi.client.calendar.freebusy.query({
+                "resource":{
+                    timeMin: eventStartTime,
+                    timeMax: eventEndTime,
+                    timeZone: 'Europe/Bucharest',
+                    items: [{id: 'primary'}]
+                }
+            })
+                .then(
+                function(response){
+                    console.log(response)
+                    var eventsArr = response.result.calendars.primary.busy;
+                
+                    if(eventsArr.length === 0) 
+                        insertAppointment(eventStartTime, eventEndTime);
+                    else{
+                        returnedMessage.innerHTML = "You are not free during " + eventStartTime + " and " + eventEndTime
+                    }
+                },
+                function(err){
+                    returnedMessage.innerHTML = "Time validation error.";
+                    console.error("Time validation error", err);
+            });
+        }
+
+        function insertAppointment(eventStartTime, eventEndTime) {
+            var returnedMessage = document.getElementById("returnedMessage");
+            
+            const event = {
+                summary: 'Medical Appointment',
+                location: 'Medical Center Location',
+                description: 
+                'Your medical appointment is set on ' + eventStartTime,
+                start: {
+                    dateTime: eventStartTime,
+                    timeZone: 'Europe/Bucharest'
+                },
+                end: {
+                    dateTime: eventEndTime,
+                    timeZone: 'Europe/Bucharest'
+                },
+                colorId: 10,
+            }
+
+            return gapi.client.calendar.events.insert({calendarId: 'primary', resource: event})
+              .then(function(response) {
+                        returnedMessage.innerHTML = ("Event added.");
+                    },
+                    function(err) { returnedMessage.innerHTML = "Execute error"; });
+        }
+
+        gapi.load("client:auth2", function() {
+            gapi.auth2.init({client_id: "813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com"});
+        });
+      </script>
+</head>
+
+<body>
+    <h1>Make an appointment.</h1>
+
+    <label for="dates">Choose the time:</label>
+    <select id="dates">
+    <option>March 13, 2020 11:30</option>
+    <option>March 13, 2020 12:00</option>
+    <option>March 13, 2020 15:00</option>
+    <option>March 14, 2020 13:00</option>
+    </select>
+    <button id="authBtn" onclick="authenticate().then(loadClient)">Authenticate</button>
+    <button id="submitBtn" onclick="checkAvailability()" hidden>Submit</button>
+    <div id="returnedMessage"></div>
+
+</body>
+
+</html>
