@@ -1,3 +1,4 @@
+require('@google-cloud/debug-agent').start();
 var express = require('express');
 
 var app = express();
