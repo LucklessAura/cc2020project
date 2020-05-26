@@ -3,6 +3,9 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    width: 99vw;
+    background-color: #EFEFEF;
+    overflow: auto;
 }
 
 * {
@@ -11,19 +14,22 @@ body {
 }
 
 section.HospitalLists {
-    height: 100vh;
+    height: 90vh;
     width: 29vw;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    position: relative;
+    top: 10vh;
 }
 
 section.maps {
-    height: 100vh;
+    height: 90vh;
     width: 70vw;
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
 
 div#map {
@@ -43,6 +49,7 @@ main.MapPage {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    top: 0;
 }
 
 table.Table {
@@ -84,7 +91,8 @@ table>tbody>tr>td {
 }
 
 table>tbody>tr>td:hover {
-    background-color: rgba(68, 68, 68, 0.2);
+    background-color: #FF3B3F;
+    cursor: pointer;
 }
 
 select#mode {
@@ -99,12 +107,13 @@ select#mode {
     height: 8vh;
     justify-content: space-evenly;
     align-items: center;
+    margin: 0px;
 }
 
 .navbar>a {
     display: block;
     text-align: center;
-    background-color: rgb(231, 39, 119);
+    background-color: #A9A9A9;
     width: 100%;
     padding: 2.8vh;
     border: 1px solid black;
@@ -120,6 +129,57 @@ select#mode {
 }
 
 .navbar>a:hover {
-    background-color: rgba(231, 39, 119, 0.8);
+    background-color: #FF3B3F;
     ;
+}
+
+*::selection {
+    background-color: #CAEBF2;
+}
+
+.indexBody main {
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: center;
+    width: 100vw;
+    flex-direction: column;
+}
+
+.indexBody main section.Main {
+    position: relative;
+    top: 20vh;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    width: 100vw;
+    height: 30vh;
+    flex-direction: column;
+}
+
+.indexBody main>section>h1.title {
+    top: 2vh;
+    width: 100vw;
+    text-align: center;
+    font-size: 7em;
+}
+
+.indexBody main>section p {
+    top: 1.5vh;
+    width: 100vw;
+    text-align: center;
+    font-size: xx-large;
+    margin: 0px;
+    padding: 0px;
+}
+
+section.NewsSection {
+    position: relative;
+    top: 50vh;
+}
+
+iframe {
+    border: 0px;
+    width: 100vw;
+    height: 200vh;
 }

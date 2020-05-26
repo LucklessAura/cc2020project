@@ -9,6 +9,9 @@ var directionService;
 var originCoords;
 var destinationCoords;
 
+var registeredHospitals = [];
+
+
 function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
@@ -74,10 +77,47 @@ navigator.geolocation.getCurrentPosition(function(location) {
         animation: google.maps.Animation.DROP
     });
 
-    Search(originLat, originLng);
+    RegisteredHospitals(originLat, originLng);
+
+
 });
 
+function RegisteredHospitals(lat, lng) {
+    revGeolocationReq = new XMLHttpRequest()
+    revGeolocationReq.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var county = "";
+            try {
+                let res = JSON.parse(this.response);
+                res = res["results"][0]["address_components"];
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i]["types"][0] == "administrative_area_level_1") {
+                        county = res[i]["short_name"];
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            }
+            console.log(county);
+            if (county != "") {
+                hospitalsRequest = new XMLHttpRequest();
+                hospitalsRequest.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        registeredHospitals = JSON.parse(this.response);
+                        Search(lat, lng);
+                    }
+                }
 
+                hospitalsRequest.open("GET", "http://localhost:8080/getHospitals.html", true);
+                hospitalsRequest.setRequestHeader("county_code", county);
+                hospitalsRequest.send();
+
+            }
+        }
+    };
+    revGeolocationReq.open("POST", "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&key=AIzaSyCLMI60gh3A2gk8NGXtsB8_HUymue0ERpU", true);
+    revGeolocationReq.send();
+}
 
 function Search(latitude, longitude) {
     var request = {
@@ -86,17 +126,38 @@ function Search(latitude, longitude) {
         radius: 15000
     };
     var service = new google.maps.places.PlacesService(map);
-
     service.nearbySearch(request, function(results, status) {
-        var unregisteradHospitals = document.getElementsByClassName("UnregisterdHospitalsBody")[0];
+        var unregisteredHospitalsTabel = document.getElementsByClassName("UnregisterdHospitalsBody")[0];
+        var registeredHospitalsTabel = document.getElementsByClassName("RegisteredHospitalsBody")[0];
+        console.log(registeredHospitals);
         if (status === google.maps.places.PlacesServiceStatus.OK) {
             for (var i = 0; i < results.length; i++) {
                 let tr = document.createElement("tr");
                 let td = document.createElement("td");
                 td.innerText = results[i].name;
                 tr.appendChild(td);
-                unregisteradHospitals.appendChild(tr);
+                if (registeredHospitals.includes(results[i].name.replace(/\"/g, ""))) {
+                    console.log("yes");
+                    registeredHospitalsTabel.appendChild(tr);
+                } else {
+                    unregisteredHospitalsTabel.appendChild(tr);
+                }
                 let markerElement = createMarker(results[i]);
+                google.maps.event.addListener(markerElement, 'click', function() {
+                    originCoords = new google.maps.LatLng(origin.lat, origin.lng);
+                    destinationCoords = new google.maps.LatLng(markerElement.getPosition().lat(), markerElement.getPosition().lng());
+
+                    let request = {
+                        origin: originCoords,
+                        destination: destinationCoords,
+                        travelMode: document.getElementById("mode").value
+                    }
+                    directionService.route(request, function(result, status) {
+                        if (status == "OK") {
+                            directionRenderer.setDirections(result);
+                        }
+                    })
+                });
                 td.addEventListener("click", function() {
                     originCoords = new google.maps.LatLng(origin.lat, origin.lng);
                     destinationCoords = new google.maps.LatLng(markerElement.getPosition().lat(), markerElement.getPosition().lng());
@@ -104,7 +165,7 @@ function Search(latitude, longitude) {
                     let request = {
                         origin: originCoords,
                         destination: destinationCoords,
-                        travelMode: "WALKING"
+                        travelMode: document.getElementById("mode").value
                     }
                     directionService.route(request, function(result, status) {
                         if (status == "OK") {
@@ -148,7 +209,7 @@ function createMarker(place) {
         position: place.geometry.location,
         label: {
             text: place.name,
-            color: '#ef0764',
+            color: '#FF3B3F',
             fontSize: '12px'
         },
         icon: icon,
