@@ -208,6 +208,7 @@ function populateHospitals() {
 }
 
 function populateDoctors() {
+    clearReturnedMessage()
     var retrievedDoctors = [];
     var selectHospitals = document.getElementById("hospitals")
     var hospital = selectHospitals.options[selectHospitals.selectedIndex].value;
@@ -232,6 +233,7 @@ function populateDoctors() {
 }
 
 function populateTime() {
+    clearReturnedMessage()
     var retrievedAvailableDates = [];
     var selectDoctors = document.getElementById('doctors')
     var doctor = selectDoctors.options[selectDoctors.selectedIndex].value;
@@ -249,6 +251,18 @@ function populateTime() {
 
     labelDate.hidden = false;
     selectDate.hidden = false;
+    if(selectDate.length == 0){
+        console.log('kasjhd')
+        var returnedMessage = document.getElementById("returnedMessage")
+        returnedMessage.innerHTML = "The selected doctor is not online."
+        returnedMessage.style = "color: red";
+    }
+}
+
+function clearReturnedMessage(){
+    var returnedMessage = document.getElementById("returnedMessage")
+    returnedMessage.innerHTML = "";
+    returnedMessage.style = "";
 }
 
 function makeSubmitAvaialable() {

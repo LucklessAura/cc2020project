@@ -7,31 +7,41 @@
     <script src="https://apis.google.com/js/api.js"></script>
     <script  src="javascripts/appointment.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-</head>
-
-<body>
+    <link rel='stylesheet', href='stylesheets/appointment.css'>
+    <link rel='stylesheet', href='stylesheets/style.css'>
     <script language="javascript">
         populateHospitals()
     </script>
-    <h1>Make an appointment.</h1>
-    <form id="make-appointment">
-        <label for="hospitals">Hospital:</label>
-        <select id="hospitals" onchange="populateDoctors()">
-            <option>--</option>
-        </select>
-        <br>
-        <label id="doctors-label" for="doctors" hidden>Doctor:</label>
-        <select id="doctors" hidden onchange="populateTime()">
-        </select>
-        <br>
-        <label id="dates-label" for="dates" hidden>Time of appointment:</label>
-        <select id="dates" hidden onchange="makeSubmitAvaialable()">
-        </select>
-        <br>
-        <!-- <button id="authBtn" onclick="authenticate().then(loadClient)">Authenticate</button> -->
-        <button type="submit" id="submit-button" onclick="checkAvailability()" disabled>Submit</button>
-        <div id="returnedMessage"></div>
-    </form>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html">Acasa</a>
+        <a href="account.html">Cont</a>
+        <a href="map.html">Harta</a>
+        <a href="appointment.html">Programari</a>
+    </nav>
+    <div class="cell">
+        <h1>Make an appointment</h1>
+        <form id="make-appointment">
+            <label for="hospitals">Hospital:</label>
+            <select id="hospitals" onchange="populateDoctors()">
+                <option>--</option>
+            </select>
+            <br>
+            <label id="doctors-label" for="doctors" hidden>Doctor:</label>
+            <select id="doctors" hidden onchange="populateTime()">
+            </select>
+            <br>
+            <label id="dates-label" for="dates" hidden>Time of appointment:</label>
+            <select id="dates" hidden onchange="makeSubmitAvaialable()">
+            </select>
+            <br>
+            <!-- <button id="authBtn" onclick="authenticate().then(loadClient)">Authenticate</button> -->
+            <button type="submit" id="submit-button" onclick="checkAvailability()" disabled>Submit</button>
+            <div id="returnedMessage"></div>
+        </form>
+    </div>
 
 </body>
 
