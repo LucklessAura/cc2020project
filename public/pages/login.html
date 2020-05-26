@@ -60,9 +60,9 @@
                 <label>Nr. de telefon</label>
                 <input type="text" id='tel_doc'>
                 <label>Numele Spitalului</label>
-                <input type="text id='num_spital'">
+                <input type="text" id='num_spital'>
                 <label>Specializare</label>
-                <input type="text" id='specializare'>
+                <input type="text" id='special'>
             </div>
             <script>changeForm();</script>
             <div class="g-signin2" data-onsuccess="onSignIn">
@@ -82,15 +82,17 @@
                         sessionStorage.setItem("name",profile.getName());
                         sessionStorage.setItem("email",profile.getEmail());
                         sessionStorage.setItem("rol",rol);
+                        location.replace("./account.html");
                     }
                     else{
-                        console.log("creating new user "+name);
+                        console.log("creating new "+rol+" "+name);
                         createUser(name,email,rol);
                         sessionStorage.setItem("name",profile.getName());
                         sessionStorage.setItem("email",profile.getEmail());
                         sessionStorage.setItem("rol",rol);
+                        location.replace("./account.html");
                     }
-                    location.replace("./account.html");
+                    // location.replace("./account.html");
                 }
 
                 function userExists(name,email,rol){
@@ -120,8 +122,9 @@
                     createUserRequest = new XMLHttpRequest();
                     createUserRequest.open("GET", "http://localhost:8080/createUser.html", false);
                     if(rol=='doctor'){
+                        
                         createUserRequest.setRequestHeader("tel", document.getElementById('tel_doc').value);
-                        createUserRequest.setRequestHeader("specializare", document.getElementById('specializare').value);
+                        createUserRequest.setRequestHeader("specializare", document.getElementById('special').value);
                         createUserRequest.setRequestHeader("spital", document.getElementById('num_spital').value);
                     }else{
                         createUserRequest.setRequestHeader("tel", document.getElementById('tel_pat').value);
