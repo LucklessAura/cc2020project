@@ -63,10 +63,11 @@ app.get("/existsUser.html",async function(req, res){
     console.log("<-!received a /existsUser request for " + rol + " " + last_name + " " + first_name + "!-->");
 
     if(rol=="doctor"){
-        query_text = "CALL get_doctor(" + last_name + ", " + first_name + ");";
-        const da = pool.query(query_text);
-        da.then(resp =>{
-            if(resp[0].length != 0){
+        pool.query("CALL get_doctor(?,?)", [last_name, first_name], (err, result, fields) => {
+            if (err) {
+                return console.error(err.message);
+              }
+              if(result[0].length != 0){
                 console.log("\t|--> sending responce: true");
                 res.send("true");
             }else{
@@ -76,10 +77,11 @@ app.get("/existsUser.html",async function(req, res){
             res.end();
         });
     }else{
-        query_text = 'CALL get_patient("'+first_name+'","'+last_name+'");';
-        const da = pool.query(query_text);
-        da.then(resp =>{
-            if(resp[0].length != 0){
+        pool.query("CALL get_patient(?,?)", [last_name, first_name], (err, result, fields) => {
+            if (err) {
+                return console.error(err.message);
+              }
+            if(result[0].length != 0){
                 console.log("\t|--> sending responce: true");
                 res.send("true");
             }else{
@@ -99,16 +101,24 @@ app.get("/createUser.html", async function(req, res) {
     console.log("<-!received a /createUser request for " + rol + " " + last_name + " " + first_name + "!-->");
     var email = req.headers["email"];
     var tel = req.headers["tel"];
-    console.log(tel);
     if(rol=="doctor"){
-        
         var special = req.headers["specializare"];
         var spital = req.headers["spital"];
-        query_text = "CALL insert_doctor("+spital + ", " + last_name + ", " + first_name + "," + tel + " ," + email + ",''," + special + ");";
-        const da = pool.query(query_text);
+        pool.query("CALL insert_doctor(?,?,?,?,?,?,?)", [spital, last_name, first_name,tel,email,"",special], (err, result, fields) => {
+            if (err) {
+                return console.error(err.message);
+              }
+              console.log("\t|-->created "+ rol + " " + last_name + " " + first_name);
+        });
     }else{
-        query_text = 'CALL insert_patient(' + last_name + ','  + first_name + ',' + tel + ' ,' + email + ',"");';
-        const da = pool.query(query_text);
+        pool.query("CALL insert_patient(?,?,?,?,?)", [last_name, first_name,tel,email,""], function(err, result, fields) {
+            if (err) {
+                return console.error(err.message);
+              }
+              console.log("\t|-->created "+ rol + " " + last_name + " " + first_name);
+            });
     }
+
+    
 })
 module.exports = app;

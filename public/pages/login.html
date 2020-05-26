@@ -75,22 +75,22 @@
                     var rol = document.getElementById('rol').value;
 
                     var exists = "";
-                    exist = userExists(name,email,rol);
+                    exists = userExists(name,email,rol);
                     
-                    if (exists){
+                    if (exists=="true"){
+                        console.log("user "+name+" exists in data base");
                         sessionStorage.setItem("name",profile.getName());
                         sessionStorage.setItem("email",profile.getEmail());
                         sessionStorage.setItem("rol",rol);
                     }
                     else{
+                        console.log("creating new user "+name);
                         createUser(name,email,rol);
                         sessionStorage.setItem("name",profile.getName());
                         sessionStorage.setItem("email",profile.getEmail());
                         sessionStorage.setItem("rol",rol);
                     }
-                    
-                    
-                   // location.replace("./account.html");
+                    location.replace("./account.html");
                 }
 
                 function userExists(name,email,rol){
@@ -117,7 +117,6 @@
                     
                     var first_name = nume.split(' ')[0];
                     var last_name = nume.split(' ')[1];
-                    console.log(first_name);
                     createUserRequest = new XMLHttpRequest();
                     createUserRequest.open("GET", "http://localhost:8080/createUser.html", false);
                     if(rol=='doctor'){
