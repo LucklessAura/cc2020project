@@ -1,35 +1,146 @@
+<!DOCTYPE HTML>
 <html>
+    <script>
+        function logincheck(){
+            if(sessionStorage.getItem("name") != null){
+                location.replace("./account.html");
+            }
+        }
+        logincheck();
 
-<head>
-
-</head>
-<script src="https://apis.google.com/js/platform.js" async defer></script>
-<script>
-    function onSignIn(googleUser) {
-        var profile = googleUser.getBasicProfile();
-        console.log('ID: ' + googleUser.getAuthResponse().id_token); // Do not send to your backend! Use an ID token instead.
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    function changeForm(){
+        var rol = document.getElementById('rol').value;
+        var form_doc = document.getElementById('form_doctor');
+        var form_pac= document.getElementById('form_patient');
+        if(rol == 'pacient'){
+            form_doc.style.visibility = "hidden";
+            form_doc.style.position = "absolute";
+            form_pac.style.visibility = "visible";
+            form_pac.style.position = "relative";
+        }else{
+            form_pac.style.visibility = "hidden";
+            form_pac.style.position = "absolute";
+            form_doc.style.visibility = "visible";
+            form_doc.style.position = "relative";
+        }
     }
 </script>
 
-<body>
-    <h1>This is the log in page</h1>
-    <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
-    <div class="g-signin2" data-onsuccess="onSignIn">
-    </div>
-    <a onclick="signOut();">Sign out</a>
-    <script>
-        function signOut() {
-            var auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(function() {
-                console.log('User signed out.');
-            });
-        }
-    </script>
+	<head>
+        <title>login</title>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
+	  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel='stylesheet', href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800&display=swap'>
+        <link rel='stylesheet', href='https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap" rel="stylesheet'>
+        <link rel='stylesheet', href='stylesheets/login.css'>
+        <link rel='stylesheet', href='stylesheets/style.css'>
+    </head>
 
+    <body >
+        <nav class="navbar">
+            <a href="index.html">Acasa</a>
+            <a href="account.html">Cont</a>
+            <a href="map.html">Harta</a>
+            <a href="appointment.html">Programari</a>
+        </nav>
 
-</body>
+        <div class="cell">
+            <h1>Mai intai trebuie sa va conectati cu contul de Google</h1>
+            <label for="cars">Sunt:</label>
+            <select onchange="changeForm()" name="roluri" id="rol">
+              <option value="pacient">Pacient</option>
+              <option value="doctor">Doctor</option>
+            </select> 
+            <div id='form_patient'>
+                <label>Nr. de telefon</label>
+                <input type="text" id='tel_pat'>
+            </div>
+            <div id='form_doctor'>
+                <label>Nr. de telefon</label>
+                <input type="text" id='tel_doc'>
+                <label>Numele Spitalului</label>
+                <input type="text id='num_spital'">
+                <label>Specializare</label>
+                <input type="text" id='specializare'>
+            </div>
+            <script>changeForm();</script>
+            <div class="g-signin2" data-onsuccess="onSignIn">
+            </div>
+            <script>
+                function onSignIn(googleUser) {
+                    var profile = googleUser.getBasicProfile();
+                    var name = profile.getName();
+                    var email = profile.getEmail();
+                    var rol = document.getElementById('rol').value;
 
+                    var exists = "";
+                    exist = userExists(name,email,rol);
+                    
+                    if (exists){
+                        sessionStorage.setItem("name",profile.getName());
+                        sessionStorage.setItem("email",profile.getEmail());
+                        sessionStorage.setItem("rol",rol);
+                    }
+                    else{
+                        createUser(name,email,rol);
+                        sessionStorage.setItem("name",profile.getName());
+                        sessionStorage.setItem("email",profile.getEmail());
+                        sessionStorage.setItem("rol",rol);
+                    }
+                    
+                    
+                   // location.replace("./account.html");
+                }
+
+                function userExists(name,email,rol){
+                    var first_name = name.split(' ')[0];
+                    var last_name = name.split(' ')[1];
+                    var resp = "";
+                    existsRequest = new XMLHttpRequest();
+                    
+                    existsRequest.open("GET", "http://localhost:8080/existsUser.html", false);
+                    existsRequest.setRequestHeader("first_name", first_name);
+                    existsRequest.setRequestHeader("last_name", last_name);
+                    existsRequest.setRequestHeader("rol",rol);
+                    existsRequest.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            console.log("got a responce = "+ this.response);
+                            resp =  this.response;
+                        }
+                        
+                    }
+                    existsRequest.send();
+                    return resp;
+                }
+                function createUser(nume,email,rol){
+                    
+                    var first_name = nume.split(' ')[0];
+                    var last_name = nume.split(' ')[1];
+                    console.log(first_name);
+                    createUserRequest = new XMLHttpRequest();
+                    createUserRequest.open("GET", "http://localhost:8080/createUser.html", false);
+                    if(rol=='doctor'){
+                        createUserRequest.setRequestHeader("tel", document.getElementById('tel_doc').value);
+                        createUserRequest.setRequestHeader("specializare", document.getElementById('specializare').value);
+                        createUserRequest.setRequestHeader("spital", document.getElementById('num_spital').value);
+                    }else{
+                        createUserRequest.setRequestHeader("tel", document.getElementById('tel_pat').value);
+                    }
+                    createUserRequest.setRequestHeader("first_name", first_name);
+                    createUserRequest.setRequestHeader("last_name", last_name);
+                    createUserRequest.setRequestHeader("email",email);
+                    createUserRequest.setRequestHeader("rol",rol);
+                    createUserRequest.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            console.log("got a responce = "+ this.response);
+                            resp =  this.response;
+                        }
+                    }
+                    createUserRequest.send();
+                }
+
+            </script>
+        </div>
+	</body>
 </html>

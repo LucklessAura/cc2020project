@@ -1,0 +1,48 @@
+<html>
+<script>
+    function logincheck(){
+        if(sessionStorage.getItem("name") == null){
+            location.replace("./login.html");
+        }
+    }
+    logincheck();
+</script>
+<head>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
+    <link rel='stylesheet', href='stylesheets/account.css'>
+    <link rel='stylesheet', href='stylesheets/style.css'>
+</head>
+
+
+
+<body>
+
+    <nav class="navbar">
+        <a href="index.html">Acasa</a>
+        <a href="account.html">Cont</a>
+        <a href="map.html">Harta</a>
+        <a href="appointment.html">Programari</a>
+    </nav>
+
+    <div visibility = hidden href="./account.html" class="g-signin2" data-onsuccess="onSignIn">
+    </div>
+    <h1>This is the account in page</h1>
+    
+    <a>Account info...</a>
+    <p><button onclick="signOut()">Sign out</button></p>
+    <script>
+        function signOut() {
+            sessionStorage.removeItem("name");
+            sessionStorage.removeItem("email");
+            sessionStorage.removeItem("rol");
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function() {
+                console.log('User signed out.');
+            });
+            location.reload();
+        }
+    </script>
+</body>
+
+</html>

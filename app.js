@@ -55,5 +55,60 @@ app.get("/getHospitals.html", async function(req, res) {
 
 })
 
+app.get("/existsUser.html",async function(req, res){
+    var first_name = req.headers["first_name"];
+    var last_name = req.headers["last_name"];
+    var rol = req.headers["rol"];
 
+    console.log("<-!received a /existsUser request for " + rol + " " + last_name + " " + first_name + "!-->");
+
+    if(rol=="doctor"){
+        query_text = "CALL get_doctor(" + last_name + ", " + first_name + ");";
+        const da = pool.query(query_text);
+        da.then(resp =>{
+            if(resp[0].length != 0){
+                console.log("\t|--> sending responce: true");
+                res.send("true");
+            }else{
+                console.log("\t|--> sending responce: fasle");
+                res.send("false");
+            }
+            res.end();
+        });
+    }else{
+        query_text = 'CALL get_patient("'+first_name+'","'+last_name+'");';
+        const da = pool.query(query_text);
+        da.then(resp =>{
+            if(resp[0].length != 0){
+                console.log("\t|--> sending responce: true");
+                res.send("true");
+            }else{
+                console.log("\t|--> sending responce: fasle");
+                res.send("false");
+            }
+            res.end();
+        });
+    }
+    
+})
+
+app.get("/createUser.html", async function(req, res) {
+    var first_name = req.headers["first_name"];
+    var last_name = req.headers["last_name"];
+    var rol = req.headers["rol"];
+    console.log("<-!received a /createUser request for " + rol + " " + last_name + " " + first_name + "!-->");
+    var email = req.headers["email"];
+    var tel = req.headers["tel"];
+    console.log(tel);
+    if(rol=="doctor"){
+        
+        var special = req.headers["specializare"];
+        var spital = req.headers["spital"];
+        query_text = "CALL insert_doctor("+spital + ", " + last_name + ", " + first_name + "," + tel + " ," + email + ",''," + special + ");";
+        const da = pool.query(query_text);
+    }else{
+        query_text = 'CALL insert_patient(' + last_name + ','  + first_name + ',' + tel + ' ,' + email + ',"");';
+        const da = pool.query(query_text);
+    }
+})
 module.exports = app;

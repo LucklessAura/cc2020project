@@ -1,0 +1,49 @@
+.cell {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    width: auto;
+    width: 50%;
+    text-align: center;
+    justify-content: center;
+    overflow: auto;
+    background-color: rgb(228, 227, 227);
+    margin-left: 25%;
+
+}
+
+#rol {
+    margin-left: 43%;
+    margin-bottom: 1%;
+    width: 15%;
+}
+
+#form_doctor{
+    display: flex;
+    flex-direction: column;
+}
+
+#form_doctor input{
+    margin-left: 40%;
+    margin-bottom: 1%;
+    width: 20%;
+}
+
+#form_patient{
+    display: flex;
+    flex-direction: column;
+}
+
+#form_patient input{
+    margin-left: 40%;
+    margin-bottom: 1%;
+    width: 20%;
+}
+
+
+
+.g-signin2{
+    margin-left: 42%;
+}
