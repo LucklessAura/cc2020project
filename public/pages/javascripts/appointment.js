@@ -198,12 +198,11 @@ gapi.load("client:auth2", function() {
 });
 
 function populateHospitals() {
-    var selectHospitals = document.getElementById("hospitals")
     $.get("/getAllHospitals", hospitals => {
+        var selectHospitals = $("#hospitals")
         hospitals.forEach(hospital => {
-            var createdOption = document.createElement("option");
-            createdOption.text = hospital;
-            selectHospitals.add(createdOption);
+            var createdOption = new Option(hospital.name);
+            selectHospitals.append(createdOption);
         });
     })
 }
@@ -215,12 +214,16 @@ function populateDoctors() {
     var labelDoctors = document.getElementById("doctors-label")
     var selectDoctors = document.getElementById("doctors")
 
+    selectDoctors.length = 0;
+    var defaultOption = document.createElement("option");
+    defaultOption.text = "--";
+    selectDoctors.add(defaultOption);
+
     var url = "/getDoctors/" + hospital;
-    $.get(url, doctors => {
+    $.get(url, retrievedDoctors => {
         retrievedDoctors.forEach(doctor => {
-            var createdOption = document.createElement("option");
-            createdOption.text = doctor;
-            selectDoctors.add(createdOption);
+            var createdOption = new Option(doctor.last_name + " " + doctor.first_name);
+            selectDoctors.append(createdOption);
         });
     })
 
@@ -240,7 +243,7 @@ function populateTime() {
         retrievedAvailableDates.forEach(date => {
             var createdOption = document.createElement("option");
             createdOption.text = date;
-            selectDate.add(createdOption);
+            selectDate.add(createdOption);  
         });
     })
 

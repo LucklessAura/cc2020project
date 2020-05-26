@@ -25,6 +25,7 @@ async function initDatabase() {
             password: "root",
             database: "hospital_db",
             host: "35.195.74.83",
+            // socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
             connectionLimit: 15,
             connectTimeout: 10000,
             acquireTimeout: 10000,
@@ -74,7 +75,7 @@ async function checkAppointments() {
     }
 }
 
-checkAppointments();
+// checkAppointments();
 
 async function createNewRoom(doctor, patient, time){
     var room_name = hashCode("doctor" + "patient");
@@ -123,22 +124,23 @@ app.get("/getHospitals.html", async function(req, res) {
 })
 
 app.get("/getAllHospitals", async function(req, res) {
-    pool.query("CALL get_hospitals_list()", (err, results, fields) => {
+    pool.query("CALL get_hospitals_list();", (err, results, fields) => {
         if(err){
-            console.log("Error in retrieving hospitals list.");
+            console.log("Error in retrieving doctors list.");
+            console.log(err);
         }
-
-        res.send(results);
+        
+        res.send(results[0]);
     })
 })
 
 app.get("/getDoctors/:hospital", (req, res) => {
-    pool.query("CALL get_hospital_doctors(?)", req.params.hospital, (err, res, fields) => {
+    pool.query("CALL get_hospital_doctors(?)", req.params.hospital, (err, results, fields) => {
         if(err){
             console.log("Error in retrieving doctors list.");
+            console.log(err);
         }
-
-        res.send(res);
+        res.send(results[0]);
     })
 })
 
@@ -151,6 +153,7 @@ app.post('/room', (req, res) => {
     res.redirect(req.body.room)
     io.emit('room-created', req.body.room)
 })
+
 
 app.get('/:room', (req, res) => {
     if (rooms[req.params.room] == null){
@@ -194,6 +197,9 @@ io.on('connection', socket => {
             socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
             delete rooms[room].users[socket.id]
         });
+    })
+    socket.on('logged-in', name => {
+        clientsAndSockets.push({name: name, socket: socket.id});
     })
 });
 

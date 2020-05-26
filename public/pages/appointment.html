@@ -3,32 +3,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proiect</title>
-    <script defer src="./socket.io/socket.io.js"></script>
+    <script  src="http://localhost:3000/socket.io/socket.io.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script defer src="javascripts/appointment.js"></script>
+    <script  src="javascripts/appointment.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 </head>
 
 <body>
+    <script language="javascript">
+        populateHospitals()
+    </script>
     <h1>Make an appointment.</h1>
-    <script>populateHospitals()</script>
     <form id="make-appointment">
         <label for="hospitals">Hospital:</label>
         <select id="hospitals" onchange="populateDoctors()">
-            <option>SKL</option>
-            <option>LKSJHD</option>
+            <option>--</option>
         </select>
         <br>
         <label id="doctors-label" for="doctors" hidden>Doctor:</label>
         <select id="doctors" hidden onchange="populateTime()">
-            <option>SKL</option>
-            <option>LKSJHD</option>
         </select>
         <br>
         <label id="dates-label" for="dates" hidden>Time of appointment:</label>
         <select id="dates" hidden onchange="makeSubmitAvaialable()">
-            <option>SKL</option>
-            <option>LKSJHD</option>
         </select>
         <br>
         <!-- <button id="authBtn" onclick="authenticate().then(loadClient)">Authenticate</button> -->
