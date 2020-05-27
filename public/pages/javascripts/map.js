@@ -108,7 +108,7 @@ function RegisteredHospitals(lat, lng) {
                     }
                 }
 
-                hospitalsRequest.open("GET", "http://localhost:8080/getHospitals.html", true);
+                hospitalsRequest.open("GET", "https://cc2020project.appspot.com/getHospitals.html", true);
                 hospitalsRequest.setRequestHeader("county_code", county);
                 hospitalsRequest.send();
 

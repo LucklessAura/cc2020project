@@ -1,4 +1,4 @@
-const socket = io('http://localhost:3000')
+const socket = io('http://https://cc2020project.appspot.com:3000')
 const messageContainer = document.getElementById('message-container')
 const roomContainer = document.getElementById('room-container')
 const messageForm = document.getElementById('send-container')
@@ -6,6 +6,7 @@ const messageInput = document.getElementById('message-input')
 
 
 if (messageForm != null){
+
     const name = prompt("What is your name?")
     
     appendMessage('You joined')
@@ -20,6 +21,12 @@ if (messageForm != null){
     })
 }
 
+gapi.load("client:auth2", function() {
+    gapi.auth2.init({client_id: "813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com"});
+});
+
+socket.emit("logged-in", sessionStorage.name)
+
 socket.on('chat-message', data => {
      appendMessage(`${data.name}: ${data.message}`)
 });
@@ -33,7 +40,6 @@ socket.on('user-disconnected', name => {
 });
 
 socket.on('room-created', room => {
-    console.log("kjsdhf");
     const roomElement = document.createElement('div')
     roomElement.innerText = room
     const roomLink = document.createElement('a')
@@ -44,8 +50,10 @@ socket.on('room-created', room => {
 });
 
 socket.on('request-doctor-availability', () => {
-    var dates = getDoctorAvailability();
-    socket.emit("response-doctor-availability", dates);
+    authenticate().then(loadClient()).then(function() {
+        var dates = getDoctorAvailability();
+        socket.emit("response-doctor-availability", dates);
+    })
 })
 
 socket.on('doctor-add-appointment', data =>{
@@ -67,7 +75,7 @@ function appendMessage(message){
       
 function authenticate() {
     return gapi.auth2.getAuthInstance()
-        .signIn({scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events"})
+        .signIn({scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/plus.login"})
         .then(function() { console.log("Sign-in successful"); },
               function(err) { console.error("Error signing in", err); });
 } 
@@ -77,8 +85,6 @@ function loadClient() {
     return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/calendar/v3/rest")
         .then(function() { 
             console.log("GAPI client loaded for API");
-            var authButton = document.getElementById("authBtn").setAttribute("hidden", "hidden");
-            var submitBtn = document.getElementById("submitBtn").removeAttribute("hidden"); 
         },  
         function(err) { console.error("Error loading GAPI client for API", err); });
 }
@@ -118,7 +124,7 @@ function checkAvailability() {
     });
 }
 
-function getDoctorAvailability() {
+async function getDoctorAvailability() {
     var dates = []
     
     var startTime = new Date();
@@ -127,8 +133,11 @@ function getDoctorAvailability() {
     var endTime = startTime;
     endTime.setHours(endTime.getHours() + 1);
     
-    while (dates.length < 10)
+    
+    var i = -1
+    while (i < 10)
     {
+        i += 1;
         gapi.client.calendar.freebusy.query({
             "resource":{
                 timeMin: startTime,
@@ -139,12 +148,16 @@ function getDoctorAvailability() {
         })
         .then(
             function(response){
+                console.log("lasjdfh")
                 var eventsArr = response.result.calendars.primary.busy;
             
                 if(eventsArr.length === 0) 
                     date.add(startTime);
             },
-            function(err){}
+            function(err){
+                console.log(err)
+                console.log("dkasfhj")
+            }
         );
 
         startTime.setHours(startTime.getHours() + 1);
@@ -193,10 +206,6 @@ function insertAppointment(eventStartTime, eventEndTime, isDoctor) {
         });
 }
 
-gapi.load("client:auth2", function() {
-    gapi.auth2.init({client_id: "813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com"});
-});
-
 function populateHospitals() {
     $.get("/getAllHospitals", hospitals => {
         var selectHospitals = $("#hospitals")
@@ -223,7 +232,7 @@ function populateDoctors() {
     var url = "/getDoctors/" + hospital;
     $.get(url, retrievedDoctors => {
         retrievedDoctors.forEach(doctor => {
-            var createdOption = new Option(doctor.last_name + " " + doctor.first_name);
+            var createdOption = new Option(doctor.first_name + " " + doctor.last_name);
             selectDoctors.append(createdOption);
         });
     })
@@ -241,6 +250,7 @@ function populateTime() {
     var selectDate = document.getElementById("dates")
     var url = "/getTime/" + doctor;
     $.get(url, function (data, status) {
+        console.log("slkajdh");
         retrievedAvailableDates = data;
         retrievedAvailableDates.forEach(date => {
             var createdOption = document.createElement("option");
@@ -252,7 +262,6 @@ function populateTime() {
     labelDate.hidden = false;
     selectDate.hidden = false;
     if(selectDate.length == 0){
-        console.log('kasjhd')
         var returnedMessage = document.getElementById("returnedMessage")
         returnedMessage.innerHTML = "The selected doctor is not online."
         returnedMessage.style = "color: red";
