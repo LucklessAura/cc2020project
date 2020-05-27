@@ -1,4 +1,4 @@
-const socket = io('http://https://cc2020project.appspot.com:3000')
+const socket = io('https://cc2020project.appspot.com:3000')
 const messageContainer = document.getElementById('message-container')
 const roomContainer = document.getElementById('room-container')
 const messageForm = document.getElementById('send-container')
