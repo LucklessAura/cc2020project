@@ -77,12 +77,12 @@
                     var exists = "";
                     exists = userExists(name,email,rol);
                     
-                    if (exists=="true"){
+                    if (exists == "true"){
                         console.log("user "+name+" exists in data base");
                         sessionStorage.setItem("name",profile.getName());
                         sessionStorage.setItem("email",profile.getEmail());
                         sessionStorage.setItem("rol",rol);
-                        location.replace("./account.html");
+                        //location.replace("./account.html");
                     }
                     else{
                         console.log("creating new "+rol+" "+name);
@@ -90,9 +90,10 @@
                         sessionStorage.setItem("name",profile.getName());
                         sessionStorage.setItem("email",profile.getEmail());
                         sessionStorage.setItem("rol",rol);
-                        location.replace("./account.html");
+                        //location.replace("./account.html");
                     }
-                    // location.replace("./account.html");
+                    console.log("Done with sign-in");
+                    location.reload();
                 }
 
                 function userExists(name,email,rol){
@@ -136,7 +137,7 @@
                     createUserRequest.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                             console.log("got a responce = "+ this.response);
-                            resp =  this.response;
+                            
                         }
                     }
                     createUserRequest.send();
