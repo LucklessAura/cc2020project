@@ -2,3 +2,20 @@
     visibility: hidden;
     position: absolute;
 }
+div{
+    font-size: 130%;;
+}
+#pac_info p{
+    margin-left: 5%;
+}
+
+#doc_info p{
+    margin-left: 5%;
+}
+
+
+.buttons > button{
+    margin: 1%;
+    width: 10%;
+    height: 5%;
+}
