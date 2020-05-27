@@ -116,7 +116,7 @@ select#mode {
     background-color: #A9A9A9;
     width: 100%;
     padding: 2.8vh;
-    border: 1px solid black;
+    border: 1px solid #EFEFEF;
     text-decoration: none;
 }
 
