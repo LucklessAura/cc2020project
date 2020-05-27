@@ -106,16 +106,24 @@ app.get("/createUser.html", async function(req, res) {
         var spital = req.headers["spital"];
         pool.query("CALL insert_doctor(?,?,?,?,?,?,?)", [spital, last_name, first_name,tel,email,"",special], (err, result, fields) => {
             if (err) {
+                res.send("error while creating");
+                res.send()
                 return console.error(err.message);
               }
               console.log("\t|-->created "+ rol + " " + last_name + " " + first_name);
+              res.send("user created");
+              res.send()
         });
     }else{
         pool.query("CALL insert_patient(?,?,?,?,?)", [last_name, first_name,tel,email,""], function(err, result, fields) {
             if (err) {
+                res.send("error while creating");
+                res.send()
                 return console.error(err.message);
               }
               console.log("\t|-->created "+ rol + " " + last_name + " " + first_name);
+              res.send("user created");
+              res.send()
             });
     }
 
