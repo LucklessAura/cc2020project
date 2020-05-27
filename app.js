@@ -24,8 +24,8 @@ async function initDatabase() {
             user: "root",
             password: "root",
             database: "hospital_db",
-            // host: "35.195.74.83",
-            socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
+            host: "35.195.74.83",
+            //socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
             connectionLimit: 15,
             connectTimeout: 10000,
             acquireTimeout: 10000,
@@ -50,8 +50,8 @@ initDatabase();
 async function checkAppointments() {
     var isFixedTime = false;
     var date = new Date();
-    while (isFixedTime == false){
-        if(date.getMinutes() == 0)
+    while (isFixedTime == false) {
+        if (date.getMinutes() == 0)
             isFixedTime = true;
     }
     while (true) {
@@ -59,13 +59,12 @@ async function checkAppointments() {
         pool.query("call get_appointments()", function(err, results) {
             if (err) {
                 console.log("Error retrieving appointments.");
-            }
-            else {
+            } else {
                 results.forEach(result => {
                     db_date = new Date(result.date)
                     db_date.setMinutes(0);
                     date.setMinutes(0);
-                    if(db_date == date){
+                    if (db_date == date) {
                         createNewRoom(result.doctor, result.patient, result.date);
                     }
                 });
@@ -77,32 +76,32 @@ async function checkAppointments() {
 
 // checkAppointments();
 
-async function createNewRoom(doctor, patient, time){
+async function createNewRoom(doctor, patient, time) {
     var room_name = hashCode("doctor" + "patient");
 
     rooms[room_name] = { users: {} }
     var sent = 0;
     clientsAndSockets.forEach(cs => {
-        if(cs.name == doctor || cs.name == patient) {
+        if (cs.name == doctor || cs.name == patient) {
             io.sockets.socket(cs.socket).emit("room-invite", room_name);
             sent += 1;
         }
         if (sent == 2)
             break;
-    });    
-} 
+    });
+}
 
 async function hashCode(str) {
     return str.split('').reduce((prevHash, currVal) =>
-      (((prevHash << 5) - prevHash) + currVal.charCodeAt(0))|0, 0);
-  }
+        (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0);
+}
 
 app.get("/test", function(req, res) {
-    res.render("createRoom", {rooms: rooms})
+    res.render("createRoom", { rooms: rooms })
 });
 
 app.get('/', (req, res) => {
-    res.render('createRoom', {rooms: rooms})
+    res.render('createRoom', { rooms: rooms })
 })
 
 app.get("/getHospitals.html", async function(req, res) {
@@ -125,18 +124,18 @@ app.get("/getHospitals.html", async function(req, res) {
 
 app.get("/getAllHospitals", async function(req, res) {
     pool.query("CALL get_hospitals_list();", (err, results, fields) => {
-        if(err){
+        if (err) {
             console.log("Error in retrieving doctors list.");
             console.log(err);
         }
-        
+
         res.send(results[0]);
     })
 })
 
 app.get("/getDoctors/:hospital", (req, res) => {
     pool.query("CALL get_hospital_doctors(?)", req.params.hospital, (err, results, fields) => {
-        if(err){
+        if (err) {
             console.log("Error in retrieving doctors list.");
             console.log(err);
         }
@@ -148,8 +147,8 @@ app.get('/getTime/:doctor', (req, res) => {
     // console.log(clientsAndSockets[0].name)
     // console.log(clientsAndSockets[1].name)
     console.log(clientsAndSockets)
-    for (var i = 0; i < clientsAndSockets.length; i++){
-        if(clientsAndSockets[i].name == req.params.doctor){
+    for (var i = 0; i < clientsAndSockets.length; i++) {
+        if (clientsAndSockets[i].name == req.params.doctor) {
             io.to(clientsAndSockets[i].socket).emit('request-doctor-availability');
             // io.sockets.socket.on('response-doctor-availability', dates => {
             //     res.send(dates)
@@ -170,7 +169,7 @@ app.get("/getUser.html", async function(req, res) {
 
     console.log("<-!received a /getUser request for " + rol + " " + last_name + " " + first_name + "!-->");
 
-    if(rol=="doctor"){
+    if (rol == "doctor") {
         pool.query("CALL get_doctor(?,?)", [last_name, first_name], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
@@ -179,7 +178,7 @@ app.get("/getUser.html", async function(req, res) {
             res.send(result[0][0]);
             res.end();
         });
-    }else{
+    } else {
         pool.query("CALL get_patient(?,?)", [last_name, first_name], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
@@ -191,43 +190,43 @@ app.get("/getUser.html", async function(req, res) {
     }
 })
 
-app.get("/existsUser.html",async function(req, res){
+app.get("/existsUser.html", async function(req, res) {
     var first_name = req.headers["first_name"];
     var last_name = req.headers["last_name"];
     var rol = req.headers["rol"];
 
     console.log("<-!received a /existsUser request for " + rol + " " + last_name + " " + first_name + "!-->");
 
-    if(rol=="doctor"){
+    if (rol == "doctor") {
         pool.query("CALL get_doctor(?,?)", [last_name, first_name], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
-              }
-              if(result[0].length != 0){
+            }
+            if (result[0].length != 0) {
                 console.log("\t|--> sending responce: true");
                 res.send("true");
-            }else{
+            } else {
                 console.log("\t|--> sending responce: fasle");
                 res.send("false");
             }
             res.end();
         });
-    }else{
+    } else {
         pool.query("CALL get_patient(?,?)", [last_name, first_name], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
-              }
-            if(result[0].length != 0){
+            }
+            if (result[0].length != 0) {
                 console.log("\t|--> sending responce: true");
                 res.send("true");
-            }else{
+            } else {
                 console.log("\t|--> sending responce: fasle");
                 res.send("false");
             }
             res.end();
         });
     }
-    
+
 })
 
 app.get("/updateInfo.html", async function(req, res) {
@@ -239,17 +238,17 @@ app.get("/updateInfo.html", async function(req, res) {
 
     console.log("<-!received a /updateInfo request for " + rol + " " + last_name + " " + first_name + "!-->");
 
-    if(rol=="doctor"){
+    if (rol == "doctor") {
         var special = req.headers['special'];
-        pool.query("UPDATE doctors SET phone_number = ?,mail=?,speciality =? where first_name = ? and last_name=?", [tel,email,special, first_name,last_name], (err, result, fields) => {
+        pool.query("UPDATE doctors SET phone_number = ?,mail=?,speciality =? where first_name = ? and last_name=?", [tel, email, special, first_name, last_name], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
             }
             res.send("\t|-->Update Succesfull");
             res.end();
         });
-    }else{
-        pool.query("UPDATE patients SET phone_number = ?,mail=? where first_name = ? and last_name=?", [tel,email, first_name,last_name], (err, result, fields) => {
+    } else {
+        pool.query("UPDATE patients SET phone_number = ?,mail=? where first_name = ? and last_name=?", [tel, email, first_name, last_name], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
             }
@@ -268,29 +267,29 @@ app.get("/createUser.html", async function(req, res) {
     console.log("<-!received a /createUser request for " + rol + " " + last_name + " " + first_name + "!-->");
     var email = req.headers["email"];
     var tel = req.headers["tel"];
-    if(rol=="doctor"){
+    if (rol == "doctor") {
         var special = req.headers["specializare"];
         var spital = req.headers["spital"];
-        pool.query("CALL insert_doctor(?,?,?,?,?,?,?)", [spital, last_name, first_name,tel,email,"",special], (err, result, fields) => {
+        pool.query("CALL insert_doctor(?,?,?,?,?,?,?)", [spital, last_name, first_name, tel, email, "", special], (err, result, fields) => {
             if (err) {
                 return console.error(err.message);
-              }
-              console.log("\t|-->created "+ rol + " " + last_name + " " + first_name);
+            }
+            console.log("\t|-->created " + rol + " " + last_name + " " + first_name);
         });
-    }else{
-        pool.query("CALL insert_patient(?,?,?,?,?)", [last_name, first_name,tel,email,""], function(err, result, fields) {
+    } else {
+        pool.query("CALL insert_patient(?,?,?,?,?)", [last_name, first_name, tel, email, ""], function(err, result, fields) {
             if (err) {
                 return console.error(err.message);
-              }
-              console.log("\t|-->created "+ rol + " " + last_name + " " + first_name);
-            });
+            }
+            console.log("\t|-->created " + rol + " " + last_name + " " + first_name);
+        });
     }
 
-    
+
 })
 
 app.post('/room', (req, res) => {
-    if (rooms[req.body.room] != null){
+    if (rooms[req.body.room] != null) {
         return res.redirect('/')
     }
     rooms[req.body.room] = { users: {} }
@@ -300,16 +299,16 @@ app.post('/room', (req, res) => {
 
 
 app.get('/:room', (req, res) => {
-    if (rooms[req.params.room] == null){
+    if (rooms[req.params.room] == null) {
         return res.redirect('/')
     }
-    res.render('room', { roomName: req.params.room})
+    res.render('room', { roomName: req.params.room })
 })
 
 app.post('/finishAppointment', (req, res) => {
-    for (var i = 0; i < clientsAndSockets.length; i++){
-        if(clientsAndSockets[i].name = req.params.doctor){
-            io.to(clientsAndSockets.socket).emit('doctor-add-appointment', {start: req.params.start, end: req.params.end} );
+    for (var i = 0; i < clientsAndSockets.length; i++) {
+        if (clientsAndSockets[i].name = req.params.doctor) {
+            io.to(clientsAndSockets.socket).emit('doctor-add-appointment', { start: req.params.start, end: req.params.end });
         }
     }
 
@@ -323,10 +322,10 @@ io.on('connection', socket => {
         socket.to(room).broadcast.emit('user-connected', name)
     })
     socket.on('send-chat-message', (room, message) => {
-        socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id]})
+        socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
     })
     socket.on('disconnect', () => {
-        getUserRooms(socket).forEach(room => { 
+        getUserRooms(socket).forEach(room => {
             socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
             delete rooms[room].users[socket.id]
         });
@@ -336,13 +335,13 @@ io.on('connection', socket => {
         console.log(name)
         var found = false
         clientsAndSockets.forEach(cs => {
-            if(cs.name == name){
+            if (cs.name == name) {
                 cs.socket = socket.id;
                 found = true;
             }
         })
-        if(found == false) {
-            clientsAndSockets.push({name: name, socket: socket.id});
+        if (found == false) {
+            clientsAndSockets.push({ name: name, socket: socket.id });
         }
     })
 
@@ -350,9 +349,9 @@ io.on('connection', socket => {
 
 function getUserRooms(socket) {
     return Object.entries(rooms).reduce((names, [name, room]) => {
-        if(room.users[socket.id] != null){
+        if (room.users[socket.id] != null) {
             names.push(name)
-        } 
+        }
         return names
     }, [])
 }
