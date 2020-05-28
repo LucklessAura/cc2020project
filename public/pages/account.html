@@ -1,151 +1,62 @@
 <html>
-<script>
-    function logincheck(){
-        if(sessionStorage.getItem("name") == null){
-            location.replace("./login.html");
-        }
-    }
-    logincheck();
-</script>
+
 <head>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sen&display=swap" rel="stylesheet">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script  src="javascripts/appointment.js"></script>
-    <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
-    <link rel='stylesheet', href='stylesheets/account.css'>
-    <link rel='stylesheet', href='stylesheets/style.css'>
+    <script src="javascripts/account.js"></script>
 </head>
-<script>
-    function signOut() {
-        sessionStorage.removeItem("name");
-        sessionStorage.removeItem("email");
-        sessionStorage.removeItem("rol");
-        var auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut().then(function() {
-            console.log('User signed out.');
-        });
-        location.reload();
-    }
-</script>
 
-
-<body>
-
+<body class="Account">
     <nav class="navbar">
         <a href="index.html">Acasa</a>
         <a href="account.html">Cont</a>
         <a href="map.html">Harta</a>
         <a href="appointment.html">Programari</a>
     </nav>
+    <main>
+        <section id="notLogged">
+            <h2>Nu esti autentificat inca</h2>
 
-    <div visibility = hidden href="./account.html" class="g-signin2" data-onsuccess="onSignIn">
-    </div>
-    
-    <div id='pac_info'>
-        <h1>Informatiile mele:</h1>
-        <label for="">Nume:</label>
-        <p id='nume'></p>
-        <label for="">Prenume:</label>
-        <p id ='prenume'></p>
-        <label>Nr. Telefon:</label>
-        <p id='tel'></p>
-        <label for="">Adresa de Email:</label>
-        <p id='mail'></p>
-        
-    </div>
+            <div>
+                <p id="TypeP">Autentifica-te ca: </p>
+                <select name="type" id="type" onchange="SelectChanged()">
+                    <option value = "Doctor">Doctor</option>
+                    <option value = "Pacient">Pacient</option>
+                </select>
+            </div>
 
-    <div id='doc_info'>
-        <h1>Informatiile mele:</h1>
-        <label for="">Nume:</label>
-        <p id='nume_doc'></p>
-        <label for="">Prenume:</label>
-        <p id ='prenume_doc'></p>
-        <label>Specializare:</label>
-        <p id='special'></p>
-        <label>Nr. Telefon:</label>
-        <p id='tel_doc'></p>
-        <label for="">Adresa de Email:</label>
-        <p id='mail_doc'></p>
-        <!-- <label for="">Spital:</label>
-        <p id='spital'></p> -->
-        
+            <section class="LogIn">
+                <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
+                <div class="g-signin2" data-onsuccess="successfulLogin">
+            </section>
+            <p class="error"></p>
+            <div id="createAccount">
+                <label for="CreateAccount">Creeaza-mi un cont pe Doctronic automat daca nu am deja</label>
+                <input type="checkbox" Name="CreateAccount" id="CreateAccountCheckbox">
+            </div>
 
-    </div>
-    <div class ='buttons'>
-        <button onclick ="changeData()">Modifica Informatiile</button>
-        <button onclick="signOut()">Sign out</button>
-    </div>
+        </section>
+        <section id="LoggedIn">
+            <img id="UserImage" />
+            <p id="UserName"></p>
+            <button onclick="signOut()">Deautentificare</button>
+            <section id="LoggedMedication">
+            </section>
+            <section id="Appointments"> </section>
+        </section>
+
+        <script>
+            SelectChanged();
+        </script>
+    </main>
+
+
+
+
 
 </body>
-<script>
-    var doc_info = document.getElementById('doc_info');
-    var pac_info = document.getElementById('pac_info');
-    
-    if(sessionStorage.getItem("rol") == 'doctor'){
-        pac_info.style.visibility = "hidden";
-        pac_info.style.position = "absolute";
-        document.getElementById('nume_doc').innerHTML = sessionStorage.getItem('name').split(' ')[1];
-        document.getElementById('prenume_doc').innerHTML = sessionStorage.getItem('name').split(' ')[0];
-        document.getElementById('mail_doc').innerHTML = sessionStorage.getItem('email');
-        
-        var first_name = sessionStorage.getItem('name').split(' ')[0];
-        var last_name = sessionStorage.getItem('name').split(' ')[1];
-        var rol = sessionStorage.getItem("rol");
-        var resp;
-        userInfoRequest = new XMLHttpRequest();
-        
-        userInfoRequest.open("GET", "https://cc2020project.appspot.com/getUser.html", false);
-        userInfoRequest.setRequestHeader("first_name", first_name);
-        userInfoRequest.setRequestHeader("last_name", last_name);
-        userInfoRequest.setRequestHeader("rol",rol);
-        userInfoRequest.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log("got a responce = "+ this.response);
-                resp =  JSON.parse(this.response);
-                console.log(resp);
-            }
-            
-        }
-        console.log("making request");
-        userInfoRequest.send();
-        
-        document.getElementById('tel_doc').innerHTML = resp['phone_number'];
-        document.getElementById('special').innerHTML = resp['speciality'];
 
-
-        
-    }else{
-        doc_info.style.visibility = "hidden";
-        doc_info.style.position = "absolute";
-        document.getElementById('nume').innerHTML = sessionStorage.getItem('name').split(' ')[1];
-        document.getElementById('prenume').innerHTML = sessionStorage.getItem('name').split(' ')[0];
-        document.getElementById('mail').innerHTML = sessionStorage.getItem('email');
-        
-        var first_name = sessionStorage.getItem('name').split(' ')[0];
-        var last_name = sessionStorage.getItem('name').split(' ')[1];
-        var rol = sessionStorage.getItem("rol");
-        var resp;
-        userInfoRequest = new XMLHttpRequest();
-        
-        userInfoRequest.open("GET", "https://cc2020project.appspot.com/getUser.html", false);
-        userInfoRequest.setRequestHeader("first_name", first_name);
-        userInfoRequest.setRequestHeader("last_name", last_name);
-        userInfoRequest.setRequestHeader("rol",rol);
-        userInfoRequest.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log("got a responce = "+ this.response);
-                resp =  JSON.parse(this.response);
-                console.log(resp);
-            }
-            
-        }
-        console.log("making request");
-        userInfoRequest.send();
-        
-        document.getElementById('tel').innerHTML = resp['phone_number'];
-    }
-
-    function changeData(){
-        location.replace('./changeData.html');
-    }
-</script>
 </html>

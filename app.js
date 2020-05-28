@@ -1,8 +1,20 @@
 var express = require('express');
 const mysql = require('promise-mysql');
-
+const session = require('express-session')
+const { OAuth2Client } = require('google-auth-library');
 
 var app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+    secret: 'sdfgwsgsf34g6aa123',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }
+}))
+
 
 const io = require('socket.io')(3000)
 
@@ -24,9 +36,9 @@ async function initDatabase() {
             user: "root",
             password: "root",
             database: "hospital_db",
-            host: "35.195.74.83",
             //socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
-            connectionLimit: 15,
+            host: "35.195.74.83",
+            connectionLimit: 50,
             connectTimeout: 10000,
             acquireTimeout: 10000,
             waitForConnections: true,
@@ -46,6 +58,28 @@ async function initDatabase() {
 }
 
 initDatabase();
+
+
+
+app.get("/getHospitals.html", function(req, res) {
+    let code = "IS";
+    code = req.get('code');
+    const da = pool.query('SELECT name from hospitals where hospitals.city_code = \"' + code + '\";');
+    da.then(resp => {
+        let names = [];
+        for (var i = 0; i < resp.length; i++) {
+            names.push(resp[i].name);
+        }
+        res.send(JSON.stringify(names));
+        res.end();
+
+    }).catch((err) => {
+        console.log(err);
+        res.send(JSON.stringify(err));
+        res.end();
+    });
+
+})
 
 async function checkAppointments() {
     var isFixedTime = false;
@@ -104,23 +138,7 @@ app.get('/', (req, res) => {
     res.render('createRoom', { rooms: rooms })
 })
 
-app.get("/getHospitals.html", async function(req, res) {
-    var county_code = req.headers["county_code"];
-    const da = pool.query('SELECT * from hospitals where city_code ="' + county_code + '";');
-    da.then(resp => {
-        let names = [];
-        for (var i = 0; i < resp.length; i++) {
-            names.push(resp[i].name);
-        }
-        res.send(JSON.stringify(names));
-        res.end();
-    }).catch((err) => {
-        console.log(err);
-        res.send(JSON.stringify([]));
-        res.end();
-    });
 
-})
 
 app.get("/getAllHospitals", async function(req, res) {
     pool.query("CALL get_hospitals_list();", (err, results, fields) => {
@@ -188,75 +206,6 @@ app.get("/getUser.html", async function(req, res) {
             res.end();
         });
     }
-})
-
-app.get("/existsUser.html", async function(req, res) {
-    var first_name = req.headers["first_name"];
-    var last_name = req.headers["last_name"];
-    var rol = req.headers["rol"];
-
-    console.log("<-!received a /existsUser request for " + rol + " " + last_name + " " + first_name + "!-->");
-
-    if (rol == "doctor") {
-        pool.query("CALL get_doctor(?,?)", [last_name, first_name], (err, result, fields) => {
-            if (err) {
-                return console.error(err.message);
-            }
-            if (result[0].length != 0) {
-                console.log("\t|--> sending responce: true");
-                res.send("true");
-            } else {
-                console.log("\t|--> sending responce: fasle");
-                res.send("false");
-            }
-            res.end();
-        });
-    } else {
-        pool.query("CALL get_patient(?,?)", [last_name, first_name], (err, result, fields) => {
-            if (err) {
-                return console.error(err.message);
-            }
-            if (result[0].length != 0) {
-                console.log("\t|--> sending responce: true");
-                res.send("true");
-            } else {
-                console.log("\t|--> sending responce: fasle");
-                res.send("false");
-            }
-            res.end();
-        });
-    }
-
-})
-
-app.get("/updateInfo.html", async function(req, res) {
-    var first_name = req.headers["first_name"];
-    var last_name = req.headers["last_name"];
-    var rol = req.headers["rol"];
-    var tel = req.headers['tel'];
-    var email = req.headers['email'];
-
-    console.log("<-!received a /updateInfo request for " + rol + " " + last_name + " " + first_name + "!-->");
-
-    if (rol == "doctor") {
-        var special = req.headers['special'];
-        pool.query("UPDATE doctors SET phone_number = ?,mail=?,speciality =? where first_name = ? and last_name=?", [tel, email, special, first_name, last_name], (err, result, fields) => {
-            if (err) {
-                return console.error(err.message);
-            }
-            res.send("\t|-->Update Succesfull");
-            res.end();
-        });
-    } else {
-        pool.query("UPDATE patients SET phone_number = ?,mail=? where first_name = ? and last_name=?", [tel, email, first_name, last_name], (err, result, fields) => {
-            if (err) {
-                return console.error(err.message);
-            }
-            res.send("\t|-->Update Succesfull");
-            res.end();
-        });
-    }
-    location.replace('./account.html');
 })
 
 
@@ -356,5 +305,114 @@ function getUserRooms(socket) {
     }, [])
 }
 
+
+app.post("/login.html", async function(req, res) {
+    var received = req.body
+    var client = new OAuth2Client("813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6");
+    //console.log(user.id_token);
+    var token = await client.verifyIdToken({
+        idToken: received.id_token,
+    })
+    let payload = token.getPayload();
+    var user = {
+        given_name: payload.given_name,
+        family_name: payload.family_name,
+        google_id: payload.sub,
+        email: payload.email,
+        account_type: received.userType,
+    }
+    var response;
+    if (user.google_id != null) {
+        if (received.userType == "Doctor") {
+            const query = pool.query('SELECT id from doctors where doctors.google_id = \"' + user.google_id + '\";');
+            query.then(val => {
+                if (val.length > 1) {
+                    console.log("this should be unique");
+                } else if (val.length == 0) {
+                    response = { valid: false, reason: "There are no doctors with that account" }
+                    res.send(JSON.stringify(response));
+                    res.end();
+                } else {
+                    response = { valid: true }
+                    req.session.user_id = val.id;
+                    req.session.userType = user.account_type;
+                    res.send(JSON.stringify(response));
+                    res.end();
+                }
+            }).catch(err => {
+                console.log(err);
+                response = { error: err };
+                res.send(JSON.stringify(response));
+                res.end();
+            })
+        } else if (received.userType == "Pacient") {
+            const query = pool.query('SELECT id from patients where patients.google_id =\"' + user.google_id + '\";');
+            query.then(val => {
+                if (val.length > 1) {
+                    console.log("this should be unique");
+                } else if (val.length == 0) {
+                    if (received.createAccount == true) {
+                        const addQuery = pool.query(' INSERT INTO patients(given_name, family_name, email ,google_id) \
+                        VALUES (\"' + user.given_name + '\",\"' + user.family_name + '\",\"' + user.email + '\",\"' + user.google_id + '\");')
+                        addQuery.then(x => {
+                            const queryGetId = pool.query('SELECT id from patients where patients.google_id =\"' + user.google_id + '\";');
+                            queryGetId.then(resultId => {
+                                req.session.user_id = resultId.id;
+                                req.session.userType = user.account_type;
+                            }).catch(err => {
+                                console.log(err);
+                                response = { error: err };
+                                res.send(JSON.stringify(response));
+                                res.end();
+                            })
+                            response = { valid: true }
+                            res.send(JSON.stringify(response));
+                            res.end();
+                        }).catch(er => {
+                            console.log(er);
+                            response = { error: er };
+                            res.send(JSON.stringify(response));
+                            res.end();
+                        })
+                    } else {
+                        response = { valid: false, reason: "Acel cont nu exista" };
+                        res.send(JSON.stringify(response));
+                        res.end();
+                    }
+
+
+                } else {
+                    req.session.id = val.id;
+                    req.session.userType = user.account_type;
+                    response = { valid: true }
+                    res.send(JSON.stringify(response));
+                    res.end();
+                }
+            }).catch(err => {
+                console.log(err);
+                response = { error: err };
+                res.send(JSON.stringify(response));
+                res.end();
+            })
+
+        } else {
+            response = { valid: false };
+            res.send(JSON.stringify(response));
+            res.end();
+        }
+    } else {
+        response = { valid: false };
+        res.send(JSON.stringify(response));
+        res.end();
+    }
+})
+
+
+app.post("/logout.html", function(req, res) {
+    req.session.destroy(function() {
+        console.log("Logged Out");
+    });
+    res.end();
+})
 
 module.exports = app;
