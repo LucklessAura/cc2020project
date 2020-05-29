@@ -99,7 +99,7 @@ function RegisteredHospitals(lat, lng) {
                 console.log(error);
             }
             console.log(county);
-            if (county != "") {
+            if (county != "" && county != null) {
                 hospitalsRequest = new XMLHttpRequest();
                 hospitalsRequest.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -109,7 +109,7 @@ function RegisteredHospitals(lat, lng) {
                 }
 
                 hospitalsRequest.open("GET", "https://cc2020project.appspot.com/getHospitals.html", true);
-                hospitalsRequest.setRequestHeader("county_code", county);
+                hospitalsRequest.setRequestHeader("code", county);
                 hospitalsRequest.send();
 
             }

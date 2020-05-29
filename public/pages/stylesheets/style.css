@@ -183,3 +183,69 @@ iframe {
     width: 100vw;
     height: 200vh;
 }
+
+img#UserImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+section#LoggedIn {
+    display: none;
+}
+
+body.Account main {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    top: 20vh;
+    height: auto;
+    overflow: auto;
+}
+
+body.Account main>section#NotLogged {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 50vh;
+}
+
+h2 {
+    font-size: 5em;
+}
+
+#TypeP {
+    display: inline;
+    font-size: larger;
+}
+
+#createAccount {
+    display: none;
+}
+
+.error {
+    display: inline;
+    font-size: larger;
+    color: rgb(207, 7, 7);
+}
+
+#UserName {
+    display: inline;
+    font-size: 2em;
+    color: black;
+}
+
+section#LoggedIn {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 98vw;
+    height: auto;
+}
