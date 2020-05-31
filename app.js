@@ -270,12 +270,14 @@ app.get('/:room', (req, res) => {
 
 app.post('/finishAppointment', (req, res) => {
     for (var i = 0; i < clientsAndSockets.length; i++) {
-        if (clientsAndSockets[i].name = req.params.doctor) {
-            io.to(clientsAndSockets.socket).emit('doctor-add-appointment', { start: req.params.start, end: req.params.end });
+        if (clientsAndSockets[i].name == req.body.doctorName) {
+            console.log("Am gasit cui sa trimit.")
+            console.log(clientsAndSockets[i].name)
+            io.to(clientsAndSockets[i].socket).emit('doctor-add-appointment', { start: req.body.start, end: req.body.end });
+            // pool.query("CALL insert_appointment(?,?,?)", [req.body.start, req.body.doctor, req.body.patient])
         }
     }
 
-    pool.query("CALL insert_appointment(?,?,?)", [req.params.start, req.params.doctor, req.params.patient])
 })
 
 io.on('connection', socket => {
@@ -313,7 +315,6 @@ io.on('connection', socket => {
     })
 
     socket.on('getTime', doctor => {
-        console.log("Received getTime")
         let requester_id = socket.id;
         for (var i = 0; i < clientsAndSockets.length; i++) {
             if (clientsAndSockets[i].socket == requester_id) {
@@ -328,14 +329,11 @@ io.on('connection', socket => {
         if (clientsAndSockets[i].name == doctor) {
                 console.log("gasit")
                 io.to(clientsAndSockets[i].socket).emit('request-doctor-availability', requester);
-                console.log("Emis request")
             }
         }
     })
 
     socket.on('response-doctor-availability', (dates, requester) => {
-        console.log("Received response")
-        console.log("receivasdasdasdasdasdasdasdsjagsdjagsdjkhbaldkhjgbaskjlhdbalksdblkded")
         console.log(dates)
         console.log(requester)
 

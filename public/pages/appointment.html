@@ -4,14 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script  src="/socket.io/socket.io.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- <script src="https://apis.google.com/js/platform.js" async defer></script> -->
     <script src="javascripts/appointment.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
     <link rel='stylesheet', href='stylesheets/appointment.css'>
     <link rel='stylesheet', href='stylesheets/style.css'>
-    <script language="javascript">
-        populateHospitals()
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Sen&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -22,23 +20,24 @@
         <a href="appointment.html">Programari</a>
     </nav>
     <div class="cell">
-        <h1>Make an appointment</h1>
+        <h1>Programare</h1>
         <form id="make-appointment">
-            <label for="hospitals">Hospital:</label>
+            <label for="hospitals">Spital:</label>
             <select id="hospitals" onchange="populateDoctors()">
                 <option>--</option>
             </select>
             <br>
-            <label id="doctors-label" for="doctors" hidden>Doctor:</label>
+            <label id="doctors-label" for="doctors" hidden>Meidc:</label>
             <select id="doctors" hidden onchange="populateTime()">
             </select>
             <br>
-            <label id="dates-label" for="dates" hidden>Time of appointment:</label>
+            <div id="loader" class="loader" hidden></div>
+            <label id="dates-label" for="dates" hidden>Ora programarii:</label>
             <select id="dates" hidden onchange="makeSubmitAvaialable()">
             </select>
             <br>
             <!-- <button id="authBtn" onclick="authenticate().then(loadClient)">Authenticate</button> -->
-            <button type="submit" id="submit-button" onclick="checkAvailability()" disabled>Submit</button>
+            <button type="button" id="submit-button" onclick="checkAvailability()" disabled>Trimite</button>
             <div id="returnedMessage"></div>
         </form>
     </div>

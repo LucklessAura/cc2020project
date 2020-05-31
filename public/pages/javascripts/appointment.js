@@ -6,6 +6,7 @@ const socket = io({
                     transports: ['polling']
                 })
 
+var isLoggedIn = false
 
 if (messageForm != null){
 
@@ -30,9 +31,22 @@ gapi.load("client:auth2", function() {
         'scope': 'profile'
     }).then(function () {
         var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
-        if(googleUser != undefined){
-            let profile = googleUser.getBasicProfile();
-            socket.emit("logged-in", profile.getName())
+        try{
+            isLoggedIn = true
+            if(googleUser != undefined){
+                let profile = googleUser.getBasicProfile();
+                socket.emit("logged-in", profile.getName())
+            }
+            populateHospitals();
+        }
+        catch(err) {
+            isLoggedIn = false
+            try{
+                var returnedMessage = document.getElementById("returnedMessage")
+                returnedMessage.innerHTML = "Pentru a face o programare este necesara autentificare cu un cont."
+                returnedMessage.style = "color: red";
+            }
+            catch {}
         }
     })
 });
@@ -60,14 +74,10 @@ socket.on('room-created', room => {
 });
 
 socket.on('request-doctor-availability', requester => {
-    console.log("Received request")
     authenticate().then(loadClient()).then(function() {
         getDoctorAvailability().then(function(res){
             var dates = res
-            console.log(dates)
-            console.log(dates.length)
             socket.emit("response-doctor-availability", dates, requester);
-            console.log("Emis response")
         })
     })
 })
@@ -79,6 +89,27 @@ socket.on('doctor-add-appointment', data =>{
 socket.on('room-invite', roomName => {
     if(confirm("You are invited to the appointment.")) {
         window.location.href = '/' + roomName
+    }
+})
+
+socket.on('getTime', dates => {
+    document.getElementById('loader').hidden = true
+    var labelDate = document.getElementById("dates-label")
+    var selectDate = document.getElementById("dates")
+    labelDate.hidden = false;
+    selectDate.hidden = false;
+    
+    dates.forEach(date => {
+        var aux = new Date(date)
+        var createdOption = document.createElement("option");
+        createdOption.text = aux.toString();
+        selectDate.add(createdOption);  
+    });
+
+    if(selectDate.length == 0){
+        var returnedMessage = document.getElementById("returnedMessage")
+        returnedMessage.innerHTML = "Medicul selectat nu este online."
+        returnedMessage.style = "color: red";
     }
 })
 
@@ -106,38 +137,44 @@ function loadClient() {
 }
 
 function checkAvailability() {
-    var returnedMessage = document.getElementById("returnedMessage");
-    var dateSelect = document.getElementById("dates");
-    var eventDate = new Date(dateSelect.options[dateSelect.selectedIndex].text);  
-    var eventStartTime = new Date(eventDate);
-    var eventEndTime = new Date (eventDate);
-    eventEndTime.setMinutes(eventEndTime.getMinutes() + 60);
-    console.log(eventStartTime);
-    console.log(eventEndTime);
+
+    authenticate().then(loadClient()).then(function() {
+        var returnedMessage = document.getElementById("returnedMessage");
+        var dateSelect = document.getElementById("dates");
+        var eventDate = new Date(dateSelect.options[dateSelect.selectedIndex].text);  
+        var eventStartTime = new Date(eventDate);
+        var eventEndTime = new Date (eventDate);
+        var appointmentForm = document.getElementById("make-appointment");
+        eventEndTime.setMinutes(eventEndTime.getMinutes() + 60);
     
-    return gapi.client.calendar.freebusy.query({
-        "resource":{
-            timeMin: eventStartTime,
-            timeMax: eventEndTime,
-            timeZone: 'Europe/Bucharest',
-            items: [{id: 'primary'}]
-        }
-    })
-        .then(
-        function(response){
-            console.log(response)
-            var eventsArr = response.result.calendars.primary.busy;
-        
-            if(eventsArr.length === 0) 
-                insertAppointment(eventStartTime, eventEndTime, false);
-            else{
-                returnedMessage.innerHTML = "You are not free during " + eventStartTime + " and " + eventEndTime
+        appointmentForm.addEventListener('submit', e => {
+            e.preventDefault()
+        })
+            
+        return gapi.client.calendar.freebusy.query({
+            "resource":{
+                timeMin: eventStartTime,
+                timeMax: eventEndTime,
+                timeZone: 'Europe/Bucharest',
+                items: [{id: 'primary'}]
             }
-        },
-        function(err){
-            returnedMessage.innerHTML = "Time validation error.";
-            console.error("Time validation error", err);
-    });
+        })
+            .then(
+            function(response){
+                var eventsArr = response.result.calendars.primary.busy;
+            
+                if(eventsArr.length === 0) 
+                    insertAppointment(eventStartTime, eventEndTime, false);
+                else{
+                    returnedMessage.innerHTML = "Calendarul dumneavoastra nu este liber intre orele " + eventStartTime + " si " + eventEndTime
+                }
+            },
+            function(err){
+                returnedMessage.innerHTML = "Time validation error.";
+                console.error("Time validation error", err);
+        });
+    })
+    
 }
 
 async function getDoctorAvailability() {
@@ -149,10 +186,8 @@ async function getDoctorAvailability() {
     var endTime = new Date(startTime);
     endTime.setHours(endTime.getHours() + 1);
         
-    var i = -1
-    while (i < 1)
+    while (dates.length < 10)
     {
-        i += 1;
         await gapi.client.calendar.freebusy.query({
             "resource":{
                 timeMin: startTime,
@@ -165,9 +200,17 @@ async function getDoctorAvailability() {
             function(response){
                 var eventsArr = response.result.calendars.primary.busy;
                 if(eventsArr.length === 0) {
+                    if(endTime.getHours() >= 16 || startTime.getHours() >= 15){
+                        startTime.setHours(startTime.getHours() + (8 - startTime.getHours()) % 24)
+                        startTime.setDate(startTime.getDate() + 1)
+                        endTime.setDate(endTime.getDate() + 1)
+                        endTime.setHours(startTime.getHours() + 1)
+                    }
+                    else {
+                        startTime.setHours(startTime.getHours() + 1);
+                        endTime.setHours(endTime.getHours() + 1);
+                    }
                     dates.push(new Date(startTime));
-                    startTime.setHours(startTime.getHours() + 1);
-                    endTime.setHours(endTime.getHours() + 1);
                 }
             },
             function(err){
@@ -176,20 +219,26 @@ async function getDoctorAvailability() {
         );
 
     }
-    console.log(dates)
     return dates;
 }
 
 function insertAppointment(eventStartTime, eventEndTime, isDoctor) {
-    var returnedMessage = document.getElementById("returnedMessage");
-    var doctors = document.getElementById("doctors");
-    var doctor = doctors.options[doctors.selectedIndex].value;
-      
+    
+    if(isDoctor){
+        var description = "";
+    }
+    else {
+        var hospitalsForm = document.getElementById("hospitals")
+        var hospital = hospitalsForm.options[hospitalsForm.selectedIndex].value
+        var doctorsForm = document.getElementById("doctors")
+        var doctor = doctorsForm.options[doctorsForm.selectedIndex].value
+        var description = "Ati programat un consult cu Dr. " + doctor
+    }
+
     const event = {
-        summary: 'Medical Appointment',
-        location: 'Medical Center Location',
-        description: 
-        'Your medical appointment is set on ' + eventStartTime,
+        summary: 'Programare medicala',
+        location: hospital,
+        description: description,
         start: {
             dateTime: eventStartTime,
             timeZone: 'Europe/Bucharest'
@@ -200,23 +249,27 @@ function insertAppointment(eventStartTime, eventEndTime, isDoctor) {
         },
         colorId: 10,
     } 
-
+    
     return gapi.client.calendar.events.insert({calendarId: 'primary', resource: event})
-        .then(function(response) {
-            if(!isDoctor) {
-                returnedMessage.innerHTML = ("Event added.");
-                $.post("./finishAppointment", {
-                    doctor: doctor,
-                    start: eventStartTime,
-                    end: eventEndTime
-                }, function(data, status){
-                })
-            }
-        },
-        function(err) {
-            if(!isDoctor)
-                returnedMessage.innerHTML = "Execute error";
-        });
+    .then(function(response) {
+        if(!isDoctor) {
+            var returnedMessage = document.getElementById("returnedMessage");
+            var doctors = document.getElementById("doctors");
+            var doctor = doctors.options[doctors.selectedIndex].value;
+            returnedMessage.innerHTML = ("Event added.");
+            $.ajax({
+                url: '/finishAppointment',
+                type: "POST",
+                data: JSON.stringify({ doctorName: doctor, start: eventStartTime, end: eventEndTime}),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+            })
+        }
+    },
+    function(err) {
+        if(!isDoctor)
+            returnedMessage.innerHTML = "Execute error";
+    });
 }
 
 function populateHospitals() {
@@ -255,6 +308,8 @@ function populateDoctors() {
 }
 
 function populateTime() {
+    var loader = document.getElementById('loader')
+    loader.hidden = false;
     clearReturnedMessage()
     var retrievedAvailableDates = [];
     var selectDoctors = document.getElementById('doctors')
@@ -262,48 +317,25 @@ function populateTime() {
     var labelDate = document.getElementById("dates-label")
     var selectDate = document.getElementById("dates")
     var url = "/getTime/" + doctor;
-    // $.get(url, function (data, status) {
-    //     console.log("slkajdh");
-    //     retrievedAvailableDates = data;
-    //     retrievedAvailableDates.forEach(date => {
-    //         var createdOption = document.createElement("option");
-    //         createdOption.text = date;
-    //         selectDate.add(createdOption);  
-    //     });
-    // })
 
+    if(doctor != "--")
     socket.emit('getTime', doctor);
-    console.log("Emis getTimes")
 
-    // labelDate.hidden = false;
-    // selectDate.hidden = false;
-    // if(selectDate.length == 0){
-    //     var returnedMessage = document.getElementById("returnedMessage")
-    //     returnedMessage.innerHTML = "The selected doctor is not online."
-    //     returnedMessage.style = "color: red";
-    // }
+    setTimeout(awaitResponse, 3500)
 }
 
-socket.on('getTime', dates => {
-    var labelDate = document.getElementById("dates-label")
-    var selectDate = document.getElementById("dates")
-    labelDate.hidden = false;
-    selectDate.hidden = false;
-    console.log(dates)
-    
-    dates.forEach(date => {
-        var aux = new Date(date)
-        var createdOption = document.createElement("option");
-        createdOption.text = aux.toString();
-        selectDate.add(createdOption);  
-    });
-
-    if(selectDate.length == 0){
+function awaitResponse(){    
+    var dates = document.getElementById("dates");
+    if(dates.hidden == true){
         var returnedMessage = document.getElementById("returnedMessage")
-        returnedMessage.innerHTML = "The selected doctor is not online."
+        returnedMessage.innerHTML = "Medicul selectat nu este online."
         returnedMessage.style = "color: red";
     }
-})
+    else{
+        makeSubmitAvaialable()
+    }
+    document.getElementById('loader').hidden = true
+}
 
 function clearReturnedMessage(){
     var returnedMessage = document.getElementById("returnedMessage")
