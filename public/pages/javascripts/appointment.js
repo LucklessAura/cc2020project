@@ -8,23 +8,6 @@ const socket = io({
 
 var isLoggedIn = false
 
-if (messageForm != null){
-
-    const name = prompt("What is your name?")
-    
-    appendMessage('You joined')
-    socket.emit('new-user', roomName, name)
-
-    messageForm.addEventListener('submit', e => {
-        e.preventDefault()
-        const message = messageInput.value
-        appendMessage(`You: ${message}`)
-        socket.emit('send-chat-message', roomName, message)
-        messageInput.value = ''
-    })
-}
-
-
 gapi.load("client:auth2", function() {
     auth2 = gapi.auth2.init({
         client_id: "813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com",
@@ -36,6 +19,18 @@ gapi.load("client:auth2", function() {
             if(googleUser != undefined){
                 let profile = googleUser.getBasicProfile();
                 socket.emit("logged-in", profile.getName())
+                
+                if (messageForm != null){
+                    socket.emit("new-user", roomName)
+                
+                    messageForm.addEventListener('submit', e => {
+                        e.preventDefault()
+                        const message = messageInput.value
+                        appendMessage(`You: ${message}`)
+                        socket.emit('send-chat-message', roomName, message)
+                        messageInput.value = ''
+                    })
+                }
             }
             populateHospitals();
         }
@@ -56,12 +51,16 @@ socket.on('chat-message', data => {
 });
 
 socket.on('user-connected', name => {
-    appendMessage(`${name} connected`)
+    appendMessage(`${name} s-a conectat.`)
 });
 
 socket.on('user-disconnected', name => {
-    appendMessage(`${name} disconnected`)
+    appendMessage(`${name} s-a deconectat.`)
 });
+
+socket.on('user-unavailable', name => {
+    appendMessage(`${name} nu este disponibil.`)
+})
 
 socket.on('room-created', room => {
     const roomElement = document.createElement('div')
@@ -86,11 +85,24 @@ socket.on('doctor-add-appointment', data =>{
     insertAppointment(data.start, data.end, true);
 })
 
-socket.on('room-invite', roomName => {
-    if(confirm("You are invited to the appointment.")) {
-        window.location.href = '/' + roomName
+socket.on('room-invite', data => {
+    if(confirm("Sunteti invitat la programare. Daca refuzati, veti fi invitat din nou peste 15 minute.")) {
+        window.location.href = '/' + data.roomName
+    }
+    else{
+        socket.emit("invite-rejected", {roomName: data.roomName, memberName:data.memberName});
     }
 })
+
+socket.on('room-invite2', data => {
+    if(confirm("Sunteti invitat la programare.")) {
+        window.location.href = "/" + data.roomName
+    }
+    else {
+        socket.emit("invite-rejected2", {roomName: data.roomName, memberName:data.memberName});
+    }
+})
+
 
 socket.on('getTime', dates => {
     document.getElementById('loader').hidden = true
