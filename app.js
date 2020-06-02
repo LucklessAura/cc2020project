@@ -159,7 +159,7 @@ app.get("/getDoctors/:hospital", (req, res) => {
         if (err) {
             console.log("Error in retrieving doctors list.");
             console.log(err);
-        }else{
+        } else {
             console.log(results)
             res.send(results);
         }
