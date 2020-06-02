@@ -233,7 +233,6 @@ async function getDoctorAvailability() {
         );
 
     }
-    console.log("lashndk")
     return dates;
 }
 
