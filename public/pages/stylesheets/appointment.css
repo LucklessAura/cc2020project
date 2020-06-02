@@ -115,3 +115,48 @@ select {
         transform: rotate(360deg);
     }
 }
+
+.navbar {
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 8vh;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 0px;
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+}
+
+.navbar>a {
+    display: block;
+    text-align: center;
+    background-color: #A9A9A9;
+    width: 100%;
+    padding: 2.8vh;
+    border: 1px solid black;
+    text-decoration: none;
+}
+
+.navbar>a:active {
+    text-decoration: none;
+}
+
+.navbar>a:visited {
+    text-decoration: none;
+}
+
+.navbar>a:hover {
+    background-color: #FF3B3F;
+    ;
+}
+
+*::selection {
+    background-color: #CAEBF2;
+}
+
+* {
+    font-family: Sen;
+    color: black;
+}
