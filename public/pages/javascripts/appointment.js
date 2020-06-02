@@ -94,7 +94,7 @@ socket.on('room-invite', data => {
     }
 })
 
-socket.on('room-invite2', data => {
+socket.on('room-invite-2', data => {
     if(confirm("Sunteti invitat la programare.")) {
         window.location.href = "/" + data.roomName
     }

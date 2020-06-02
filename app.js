@@ -38,8 +38,8 @@ async function initDatabase() {
             user: "root",
             password: "root",
             database: "hospital_db",
-            socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
-            // host: "35.195.74.83",
+            // socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
+            host: "35.195.74.83",
             connectionLimit: 50,
             connectTimeout: 10000,
             acquireTimeout: 10000,
@@ -70,12 +70,23 @@ initDatabase().then(function() {
         nextDate.setMilliseconds(0)
 
         var difference = nextDate - new Date();
-        setTimeout(checkAppointments, difference);
+        // setTimeout(checkAppointments, difference);
     }
 
     setTimeout(checkAppointments, 5000)
+    setTimeout(cleanUpRooms, 5000)
 });
 
+
+async function cleanUpRooms() {
+    for(const room in rooms) {
+        if( !room.hasOwnProperty('createdAt') || new Date() - rooms[room].createdAt > 3600000){
+            delete rooms[room]
+        } 
+    }
+
+    setTimeout(cleanUpRooms, 7200000) // 2 hours
+}
 
 
 app.get("/getHospitals.html", function(req, res) {
@@ -113,38 +124,40 @@ async function checkAppointments() {
                 date.setMilliseconds(0);
                 if (db_date - date == 0) {
                     // createNewRoom(result.doctor, result.patient, result.date);
-                    createNewRoom("Cristian Tugui", "Anonymous", date)
                 }
             });
+            createNewRoom("Cristian Tugui", "Anonymous", date)
         }
     })
 }
 
-
-
 async function createNewRoom(doctor, patient, time) {
     var room_name = hashCode(doctor + patient + time);
 
-    rooms[room_name] = { users: {} }
+    rooms[room_name] = { users: {}, createdAt: new Date() }
     var sentToDoctor = false;
     var sentToPatient = false;
+    var i =0
     clientsAndSockets.forEach(cs => {
-        if (cs.name == doctor) {
+        console.log(i);
+        i += 1
+        if (!sentToDoctor && cs.name == doctor) {
             inviteMemberToRoom(cs.socket, doctor, room_name)
             console.log("sent doctor")
             sentToDoctor = true;
         }
-        if (cs.name == patient) {
+        if (!sentToPatient && cs.name == patient) {
             inviteMemberToRoom(cs.socket, patient, room_name)
             console.log("sent patient")
+            console.log(cs.name)
             sentToPatient = true;
         }
     });
     if (!sentToDoctor) {
-        setTimeout(function() { secondInviteToRoom(doctor, room_name) }, 10000) // 15 min
+        setTimeout(function() {secondInviteToRoom(doctor, room_name) }, 10000) // 15 min
     }
     if (!sentToPatient) {
-        setTimeout(function() { secondInviteToRoom(patient, room_name) }, 10000) // 15 min
+        setTimeout(function() {secondInviteToRoom(patient, room_name) }, 10000) // 15 min
     }
 }
 
@@ -153,9 +166,12 @@ function inviteMemberToRoom(memberSocket, memberName, roomName) {
 }
 
 function secondInviteToRoom(member, roomName) {
+    console.log("Second invite initialized.")
+    console.log(member)
     var found = false;
     clientsAndSockets.forEach(cs => {
         if (cs.name == member) {
+            console.log(cs.socket)
             io.to(cs.socket).emit("room-invite-2", { roomName: roomName, memberName: member });
             found = true;
         }
@@ -368,7 +384,8 @@ io.on('connection', socket => {
     socket.on('invite-rejected', data => {
         var roomName = data.roomName
         var memberName = data.memberName
-        setTimeout(function() { secondInviteToRoom(memberName, roomName) }, 10000) // 15 min 900000
+        
+        setTimeout(function() {secondInviteToRoom(memberName, roomName) }, 5000) // 15 min 900000
     })
 
     socket.on('invite-rejected2', data => {
