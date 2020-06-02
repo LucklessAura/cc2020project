@@ -291,7 +291,7 @@ io.on('connection', socket => {
     })
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
-      });
+    });
     socket.on('disconnect', () => {
         getUserRooms(socket).forEach(room => {
             socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
@@ -326,7 +326,7 @@ io.on('connection', socket => {
         console.log(requester)
 
         for (var i = 0; i < clientsAndSockets.length; i++) {
-        if (clientsAndSockets[i].name == doctor) {
+            if (clientsAndSockets[i].name == doctor) {
                 console.log("gasit")
                 io.to(clientsAndSockets[i].socket).emit('request-doctor-availability', requester);
             }
@@ -470,6 +470,6 @@ app.post("/logout.html", function(req, res) {
 if (module === require.main) {
     const PORT = process.env.PORT || 8080;
     server.listen(PORT, () => {
-      console.log(`App listening on port ${PORT}`);
+        console.log(`App listening on port ${PORT}`);
     });
-  }
+}
