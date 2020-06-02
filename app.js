@@ -39,7 +39,7 @@ async function initDatabase() {
             password: "root",
             database: "hospital_db",
             socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
-            //host: "35.195.74.83",
+            // host: "35.195.74.83",
             connectionLimit: 50,
             connectTimeout: 10000,
             acquireTimeout: 10000,
@@ -61,7 +61,6 @@ async function initDatabase() {
 
 initDatabase().then(function() {
     var nextDate = new Date();
-    console.log(nextDate)
     if (nextDate.getMinutes() === 0) { // You can check for seconds here too
         checkAppointments()
     } else {
@@ -99,9 +98,7 @@ app.get("/getHospitals.html", function(req, res) {
 
 })
 
-// insert into appointments (doctor_id, patient_id, date) values (
 async function checkAppointments() {
-    console.log(clientsAndSockets)
     var date = new Date("2020-06-01T15:13:03.969Z")
     pool.query("SELECT * FROM appointments", function(err, results) {
         if (err) {
