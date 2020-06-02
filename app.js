@@ -150,7 +150,7 @@ async function checkAppointments() {
                     // createNewRoom(doctor, patient, result.date);
                 }
             });
-            // createNewRoom("Cristian Tugui", "Anonymous", date)
+            createNewRoom("Cristian Tugui", "Anonymous", date)
         }
     })
 }
@@ -362,7 +362,8 @@ io.on('connection', socket => {
         socket.to(room).broadcast.emit('user-connected', name)
     })
     socket.on('send-chat-message', (room, message) => {
-        socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+        // socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+        io.in(room).emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
     })
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);

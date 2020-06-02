@@ -7,6 +7,7 @@ const socket = io({
                 })
 
 var isLoggedIn = false
+var username = undefined
 
 gapi.load("client:auth2", function() {
     auth2 = gapi.auth2.init({
@@ -18,15 +19,15 @@ gapi.load("client:auth2", function() {
             isLoggedIn = true
             if(googleUser != undefined){
                 let profile = googleUser.getBasicProfile();
-                socket.emit("logged-in", profile.getName())
-                
+                username = profile.getName();
+                socket.emit("logged-in", username)
                 if (messageForm != null){
                     socket.emit("new-user", roomName)
                 
                     messageForm.addEventListener('submit', e => {
                         e.preventDefault()
                         const message = messageInput.value
-                        appendMessage(`You: ${message}`)
+                        // appendMessage(`You: ${message}`)
                         socket.emit('send-chat-message', roomName, message)
                         messageInput.value = ''
                     })
@@ -47,7 +48,10 @@ gapi.load("client:auth2", function() {
 });
 
 socket.on('chat-message', data => {
-     appendMessage(`${data.name}: ${data.message}`)
+    if(data.name != username)
+        appendMessage(`${data.name}: ${data.message}`)
+    else
+        appendMessage(`You: ${data.message}`)
 });
 
 socket.on('user-connected', name => {
