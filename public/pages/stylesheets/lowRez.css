@@ -13,6 +13,93 @@ body {
     color: black;
 }
 
+section.HospitalLists {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    position: relative;
+    top: 10vh;
+}
+
+section.maps {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+div#map {
+    height: 85vh;
+    width: 100vw;
+    display: block;
+    flex-shrink: 0;
+}
+
+div#directionsPanel {
+    width: 100%;
+    overflow: auto;
+    flex-shrink: 0;
+    height: auto;
+}
+
+main.MapPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    top: 10vh;
+    position: relative;
+}
+
+table.Table {
+    width: 100vw;
+    overflow: auto;
+}
+
+table.Table>thead {
+    height: 20%;
+}
+
+table.Table>tbody {
+    height: 80%;
+}
+
+table.Table>thead>tr>th {
+    width: auto;
+    height: 15vh;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 2px solid rgba(68, 68, 68, 0.5);
+    font-family: Sen;
+    font-weight: 400;
+    font-size: 1.1em;
+}
+
+table td {
+    height: 7vh;
+}
+
+table>tbody>tr>td {
+    width: auto;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+    font-family: Sen;
+    font-weight: 400;
+    font-size: 0.9em;
+}
+
+table>tbody>tr>td:hover {
+    background-color: #FF3B3F;
+    cursor: pointer;
+}
+
+select#mode {
+    width: 50vw;
+    border-radius: 5px;
+}
+
 .navbar {
     top: 0;
     left: 0;
@@ -21,6 +108,9 @@ body {
     justify-content: space-evenly;
     align-items: center;
     margin: 0px;
+    position: fixed;
+    z-index: 100;
+    width: 100%;
 }
 
 .navbar>a {
@@ -96,4 +186,172 @@ iframe {
     width: 100%;
     border: 0px;
     height: 100%;
+}
+
+img#UserImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+section#LoggedIn {
+    display: none;
+}
+
+body.Account main {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    top: 20vh;
+    height: auto;
+    overflow: auto;
+}
+
+body.Account main>section#NotLogged {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 50vh;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+#TypeP {
+    display: inline;
+    font-size: 1.1em;
+}
+
+#createAccount {
+    display: none;
+}
+
+.error {
+    display: inline;
+    font-size: 1.1em;
+    color: rgb(207, 7, 7);
+}
+
+#UserName {
+    display: inline;
+    font-size: 1.3em;
+    color: black;
+}
+
+section#LoggedIn {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 98vw;
+    height: auto;
+}
+
+.cell {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: auto;
+    width: 75%;
+    text-align: center;
+    font-size: 1.1em;
+    justify-content: center;
+    overflow: auto;
+    background-color: rgb(228, 227, 227);
+    margin-left: 12.5%;
+}
+
+.chatbox {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    width: auto;
+    width: 50%;
+    font-size: 20px;
+    justify-content: top;
+    overflow: auto;
+    background-color: rgb(228, 227, 227);
+    margin-left: 25%;
+}
+
+#message-container {
+    display: inline-block;
+    overflow: auto;
+    border-style: solid;
+    height: 60%;
+    border-radius: 1%;
+    border-color: black;
+    margin-top: 2%;
+    padding-top: 2%;
+    padding-left: 2%;
+    padding-right: 2%;
+    padding-bottom: 2%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#send-container {
+    display: inline-block;
+}
+
+.send-text {
+    margin-top: 5%;
+    margin-left: 5%;
+    width: 80%;
+    word-break: break-word;
+}
+
+#send-button {
+    height: 50%;
+    width: 10%;
+}
+
+#make-appointment {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#make-appointment input {
+    margin-left: 40%;
+    margin-bottom: 1%;
+    width: 20%;
+}
+
+#submit-button {
+    width: fit-content;
+    font-size: 1.1em;
+}
+
+.loader {
+    align-self: center;
+    border: 10px solid #f3f3f3;
+    /* Light grey */
+    border-top: 10px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
