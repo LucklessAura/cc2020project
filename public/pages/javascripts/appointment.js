@@ -77,6 +77,7 @@ socket.on('request-doctor-availability', requester => {
         getDoctorAvailability().then(function(res){
             var dates = res
             socket.emit("response-doctor-availability", dates, requester);
+            console.log()
         })
     })
 })
@@ -99,7 +100,7 @@ socket.on('room-invite-2', data => {
         window.location.href = "/" + data.roomName
     }
     else {
-        socket.emit("invite-rejected2", {roomName: data.roomName, memberName:data.memberName});
+        socket.emit("invite-rejected-2", {roomName: data.roomName, memberName:data.memberName});
     }
 })
 
@@ -190,6 +191,7 @@ function checkAvailability() {
 }
 
 async function getDoctorAvailability() {
+    console.log("kazsjhbd")
     var dates = new Array();
     
     var startTime = new Date();
@@ -211,7 +213,7 @@ async function getDoctorAvailability() {
         .then(
             function(response){
                 var eventsArr = response.result.calendars.primary.busy;
-                if(eventsArr.length === 0) {
+                if(eventsArr.length <= 1) {
                     if(endTime.getHours() >= 16 || startTime.getHours() >= 15){
                         startTime.setHours(startTime.getHours() + (8 - startTime.getHours()) % 24)
                         startTime.setDate(startTime.getDate() + 1)
@@ -231,6 +233,7 @@ async function getDoctorAvailability() {
         );
 
     }
+    console.log("lashndk")
     return dates;
 }
 
@@ -269,10 +272,13 @@ function insertAppointment(eventStartTime, eventEndTime, isDoctor) {
             var doctors = document.getElementById("doctors");
             var doctor = doctors.options[doctors.selectedIndex].value;
             returnedMessage.innerHTML = ("Event added.");
+            var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+            var patient = googleUser.getBasicProfile().getName()
+            console.log(patient)
             $.ajax({
                 url: '/finishAppointment',
                 type: "POST",
-                data: JSON.stringify({ doctorName: doctor, start: eventStartTime, end: eventEndTime}),
+                data: JSON.stringify({ doctorName: doctor, patientName: patient, start: eventStartTime, end: eventEndTime}),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json"
             })

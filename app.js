@@ -61,7 +61,7 @@ async function initDatabase() {
 
 initDatabase().then(function() {
     var nextDate = new Date();
-    if (nextDate.getMinutes() === 0) { // You can check for seconds here too
+    if (nextDate.getMinutes() === 0) { 
         checkAppointments()
     } else {
         nextDate.setHours(nextDate.getHours() + 1);
@@ -111,27 +111,51 @@ app.get("/getHospitals.html", function(req, res) {
 
 async function checkAppointments() {
     var date = new Date("2020-06-01T15:13:03.969Z")
-    pool.query("SELECT * FROM appointments", function(err, results) {
+    var qr = "SELECT d.given_name as doctor_gn, d.family_name as doctor_fn, p.given_name, p.family_name, a.date FROM appointments as a JOIN doctors as d on a.doctor_id = d.id JOIN patients as p on a.patient_id = p.id;"
+    pool.query(qr, function(err, results) {
         if (err) {
             console.log("Error retrieving appointments.");
             console.log(err)
         } else {
+            console.log(results)
             results.forEach(result => {
+                // console.log(result)
                 db_date = new Date(result.date)
                 db_date.setMinutes(0);
                 db_date.setMilliseconds(0);
                 date.setMinutes(0);
                 date.setMilliseconds(0);
                 if (db_date - date == 0) {
-                    // createNewRoom(result.doctor, result.patient, result.date);
+                    if(result.doctor_gn == "undefined")
+                        var doctor = result.doctor_fn;
+                    else
+                    {
+                        if(result.doctor_fn == "undefined")
+                            var doctor = result.doctor_gn;
+                        else
+                            var doctor = result.doctor_gn + " " + result.doctor_fn;
+                    }
+
+                    if(result.given_name == "undefined")
+                        var patient = result.family_name;
+                    else{
+                            if(result.family_name == "undefined"){
+                                var patient = result.given_name;
+                                console.log(patient)
+                            }
+                            else{
+                                var patient = result.given_name + " " + result.family_name;
+                        }
+                    }
+                    // createNewRoom(doctor, patient, result.date);
                 }
             });
-            createNewRoom("Cristian Tugui", "Anonymous", date)
+            // createNewRoom("Cristian Tugui", "Anonymous", date)
         }
     })
 }
 
-async function createNewRoom(doctor, patient, time) {
+async function createNewRoom(doctor, patient, time) { 
     var room_name = hashCode(doctor + patient + time);
 
     rooms[room_name] = { users: {}, createdAt: new Date() }
@@ -139,25 +163,21 @@ async function createNewRoom(doctor, patient, time) {
     var sentToPatient = false;
     var i =0
     clientsAndSockets.forEach(cs => {
-        console.log(i);
         i += 1
         if (!sentToDoctor && cs.name == doctor) {
             inviteMemberToRoom(cs.socket, doctor, room_name)
-            console.log("sent doctor")
             sentToDoctor = true;
         }
         if (!sentToPatient && cs.name == patient) {
             inviteMemberToRoom(cs.socket, patient, room_name)
-            console.log("sent patient")
-            console.log(cs.name)
             sentToPatient = true;
         }
     });
     if (!sentToDoctor) {
-        setTimeout(function() {secondInviteToRoom(doctor, room_name) }, 10000) // 15 min
+        setTimeout(function() { secondInviteToRoom(doctor, room_name) }, 10000) // 15 min
     }
     if (!sentToPatient) {
-        setTimeout(function() {secondInviteToRoom(patient, room_name) }, 10000) // 15 min
+        setTimeout(function() { secondInviteToRoom(patient, room_name) }, 10000) // 15 min
     }
 }
 
@@ -171,7 +191,6 @@ function secondInviteToRoom(member, roomName) {
     var found = false;
     clientsAndSockets.forEach(cs => {
         if (cs.name == member) {
-            console.log(cs.socket)
             io.to(cs.socket).emit("room-invite-2", { roomName: roomName, memberName: member });
             found = true;
         }
@@ -299,10 +318,28 @@ app.get('/:room', (req, res) => {
 app.post('/finishAppointment', (req, res) => {
     for (var i = 0; i < clientsAndSockets.length; i++) {
         if (clientsAndSockets[i].name == req.body.doctorName) {
-            console.log("Am gasit cui sa trimit.")
-            console.log(clientsAndSockets[i].name)
             io.to(clientsAndSockets[i].socket).emit('doctor-add-appointment', { start: req.body.start, end: req.body.end });
-            // pool.query("CALL insert_appointment(?,?,?)", [req.body.start, req.body.doctor, req.body.patient])
+            var doctorSplitName = req.body.doctorName.split(" ")
+            var patientSplitName = req.body.patientName.split(" ")
+            if(doctorSplitName.length > 1){
+                doctor_fname = doctorSplitName[0]
+                doctor_lname = doctorSplitName[1]
+            }
+            else {
+                doctor_fname = "undefined"
+                doctor_lname = doctorSplitName[0]
+            }
+
+            if(patientSplitName.length > 1){
+                patient_fname = patientSplitName[0]
+                patient_lname = patientSplitName[1]
+            }
+            else {
+                patient_fname = "undefined"
+                patient_lname = patientSplitName[0]
+            }
+
+            // pool.query("CALL insert_appointment(?,?,?,?,?)", [doctor_lname, doctor_fname, patient_lname, patient_fname, req.body.start])
         }
     }
 
@@ -315,18 +352,17 @@ io.on('connection', socket => {
             if (cs.socket == socket.id)
                 name = cs.name
         });
-        console.log("New user")
-        console.log(name)
+        // console.log("New user")
+        // console.log(name)
         socket.join(room)
-        console.log(rooms)
-        console.log(room)
-        console.log(socket.id)
+        // console.log(rooms)
+        // console.log(room)
+        // console.log(socket.id)
         rooms[room].users[socket.id] = name
         socket.to(room).broadcast.emit('user-connected', name)
     })
     socket.on('send-chat-message', (room, message) => {
         socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
-        console.log(socket.id)
     })
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
@@ -348,7 +384,6 @@ io.on('connection', socket => {
         if (found == false) {
             clientsAndSockets.push({ name: name, socket: socket.id });
         }
-        console.log(clientsAndSockets)
     })
 
     socket.on('getTime', doctor => {
@@ -362,16 +397,12 @@ io.on('connection', socket => {
 
         for (var i = 0; i < clientsAndSockets.length; i++) {
             if (clientsAndSockets[i].name == doctor) {
-                console.log("gasit")
                 io.to(clientsAndSockets[i].socket).emit('request-doctor-availability', requester);
             }
         }
     })
 
     socket.on('response-doctor-availability', (dates, requester) => {
-        console.log(dates)
-        console.log(requester)
-
         for (var i = 0; i < clientsAndSockets.length; i++) {
             if (clientsAndSockets[i].name == requester) {
                 requester_id = clientsAndSockets[i].socket;
@@ -388,7 +419,7 @@ io.on('connection', socket => {
         setTimeout(function() {secondInviteToRoom(memberName, roomName) }, 5000) // 15 min 900000
     })
 
-    socket.on('invite-rejected2', data => {
+    socket.on('invite-rejected-2', data => {
         socket.to(data.roomName).broadcast.emit("user-unavailable", data.memberName)
     })
 });
@@ -506,7 +537,6 @@ app.post("/login.html", async function(req, res) {
 
 
 app.post("/logout.html", function(req, res) {
-    console.log("alskjdhlasd")
     req.session.destroy(function() {
         console.log("Logged Out");
     });
