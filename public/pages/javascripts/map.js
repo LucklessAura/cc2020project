@@ -56,6 +56,12 @@ function callback(response, status) {
     document.getElementsByTagName("BODY")[0].appendChild(res);
 }
 
+var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+};
+
 navigator.geolocation.getCurrentPosition(function(location) {
     let originLng = location.coords.longitude;
     let originLat = location.coords.latitude;
@@ -80,7 +86,7 @@ navigator.geolocation.getCurrentPosition(function(location) {
     RegisteredHospitals(originLat, originLng);
 
 
-});
+}, function(err) { console.log(err) }, options);
 
 function RegisteredHospitals(lat, lng) {
     revGeolocationReq = new XMLHttpRequest()
