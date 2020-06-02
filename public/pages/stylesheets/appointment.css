@@ -1,17 +1,25 @@
+main.formMain {
+    top: 8vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: relative;
+    height: 90%;
+}
+
 .cell {
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: auto;
+    height: 90%;
     width: 50%;
     text-align: center;
     font-size: 20px;
     justify-content: top;
     overflow: auto;
     background-color: rgb(228, 227, 227);
-    margin-left: 25%;
+    margin-left: 25%; 
 
 }
 
@@ -28,7 +36,6 @@
     overflow: auto;
     background-color: rgb(228, 227, 227);
     margin-left: 25%;
-
 }
 
 #message-container{
