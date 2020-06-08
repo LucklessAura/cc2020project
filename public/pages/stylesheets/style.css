@@ -5,8 +5,8 @@ body {
     padding: 0;
     width: 99vw;
     background-color: #EFEFEF;
-    overflow: auto;
 }
+
 
 * {
     font-family: Sen;

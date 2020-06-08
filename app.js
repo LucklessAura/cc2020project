@@ -38,7 +38,7 @@ async function initDatabase() {
             user: "root",
             password: "root",
             database: "hospital_db",
-            // socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
+            //socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
             host: "35.195.74.83",
             connectionLimit: 50,
             connectTimeout: 10000,
@@ -61,7 +61,7 @@ async function initDatabase() {
 
 initDatabase().then(function() {
     var nextDate = new Date();
-    if (nextDate.getMinutes() === 0) { 
+    if (nextDate.getMinutes() === 0) {
         checkAppointments()
     } else {
         nextDate.setHours(nextDate.getHours() + 1);
@@ -79,10 +79,10 @@ initDatabase().then(function() {
 
 
 async function cleanUpRooms() {
-    for(const room in rooms) {
-        if( !room.hasOwnProperty('createdAt') || new Date() - rooms[room].createdAt > 3600000){
+    for (const room in rooms) {
+        if (!room.hasOwnProperty('createdAt') || new Date() - rooms[room].createdAt > 3600000) {
             delete rooms[room]
-        } 
+        }
     }
 
     setTimeout(cleanUpRooms, 7200000) // 2 hours
@@ -126,25 +126,23 @@ async function checkAppointments() {
                 date.setMinutes(0);
                 date.setMilliseconds(0);
                 if (db_date - date == 0) {
-                    if(result.doctor_gn == "undefined")
+                    if (result.doctor_gn == "undefined")
                         var doctor = result.doctor_fn;
-                    else
-                    {
-                        if(result.doctor_fn == "undefined")
+                    else {
+                        if (result.doctor_fn == "undefined")
                             var doctor = result.doctor_gn;
                         else
                             var doctor = result.doctor_gn + " " + result.doctor_fn;
                     }
 
-                    if(result.given_name == "undefined")
+                    if (result.given_name == "undefined")
                         var patient = result.family_name;
-                    else{
-                            if(result.family_name == "undefined"){
-                                var patient = result.given_name;
-                                console.log(patient)
-                            }
-                            else{
-                                var patient = result.given_name + " " + result.family_name;
+                    else {
+                        if (result.family_name == "undefined") {
+                            var patient = result.given_name;
+                            console.log(patient)
+                        } else {
+                            var patient = result.given_name + " " + result.family_name;
                         }
                     }
                     // createNewRoom(doctor, patient, result.date);
@@ -155,13 +153,13 @@ async function checkAppointments() {
     })
 }
 
-async function createNewRoom(doctor, patient, time) { 
+async function createNewRoom(doctor, patient, time) {
     var room_name = hashCode(doctor + patient + time);
 
     rooms[room_name] = { users: {}, createdAt: new Date() }
     var sentToDoctor = false;
     var sentToPatient = false;
-    var i =0
+    var i = 0
     clientsAndSockets.forEach(cs => {
         i += 1
         if (!sentToDoctor && cs.name == doctor) {
@@ -321,20 +319,18 @@ app.post('/finishAppointment', (req, res) => {
             io.to(clientsAndSockets[i].socket).emit('doctor-add-appointment', { start: req.body.start, end: req.body.end });
             var doctorSplitName = req.body.doctorName.split(" ")
             var patientSplitName = req.body.patientName.split(" ")
-            if(doctorSplitName.length > 1){
+            if (doctorSplitName.length > 1) {
                 doctor_fname = doctorSplitName[0]
                 doctor_lname = doctorSplitName[1]
-            }
-            else {
+            } else {
                 doctor_fname = "undefined"
                 doctor_lname = doctorSplitName[0]
             }
 
-            if(patientSplitName.length > 1){
+            if (patientSplitName.length > 1) {
                 patient_fname = patientSplitName[0]
                 patient_lname = patientSplitName[1]
-            }
-            else {
+            } else {
                 patient_fname = "undefined"
                 patient_lname = patientSplitName[0]
             }
@@ -355,9 +351,9 @@ io.on('connection', socket => {
         // console.log("New user")
         // console.log(name)
         socket.join(room)
-        // console.log(rooms)
-        // console.log(room)
-        // console.log(socket.id)
+            // console.log(rooms)
+            // console.log(room)
+            // console.log(socket.id)
         rooms[room].users[socket.id] = name
         socket.to(room).broadcast.emit('user-connected', name)
     })
@@ -416,8 +412,8 @@ io.on('connection', socket => {
     socket.on('invite-rejected', data => {
         var roomName = data.roomName
         var memberName = data.memberName
-        
-        setTimeout(function() {secondInviteToRoom(memberName, roomName) }, 5000) // 15 min 900000
+
+        setTimeout(function() { secondInviteToRoom(memberName, roomName) }, 5000) // 15 min 900000
     })
 
     socket.on('invite-rejected-2', data => {

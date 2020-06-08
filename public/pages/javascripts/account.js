@@ -19,6 +19,8 @@ function successfulLogin() {
                     loggedOut.style.display = "none";
                     var loggedIn = document.getElementById("LoggedIn");
                     loggedIn.style.display = "flex";
+                    document.cookie = "LoggedIn=True";
+                    document.cookie = "userType=" + userType;
                     if (profile.getImageUrl() != null) {
                         var img = document.getElementById("UserImage");
                         img.style.backgroundImage = "url(" + profile.getImageUrl() + ")"
@@ -31,8 +33,7 @@ function successfulLogin() {
                         }
                         username.innerText += " " + profile.getFamilyName();
                     }
-                    document.cookie = "LoggedIn=True";
-                    document.cookie = "userType=" + userType;
+
                 } else {
                     var loggedOut = document.getElementById("notLogged");
                     loggedOut.style.display = "flex";
