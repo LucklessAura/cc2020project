@@ -47,9 +47,27 @@
             <img id="UserImage" />
             <p id="UserName"></p>
             <button onclick="signOut()">Deautentificare</button>
-            <section id="LoggedMedication">
-            </section>
-            <section id="Appointments"> </section>
+           
+            <br><br><br>
+            <p>Your prescriptions:</p>
+            <table id="PrescriptionsTable">
+                <tr>
+                  <td>Doctor </td>
+                  <td> Start</td>
+                  <td>End</td>
+                  <td>Interval</td>
+                </tr>
+            </table>
+              <br>
+              <p>Your appointments:</p>
+              <table id ="AppointmentsTable">
+                <tr>
+                  <td>Doctor</td>
+                  <td>Date</td>
+                  <td>Time</td>
+                </tr>
+              </table>     
+            
         </section>
 
         <script>
