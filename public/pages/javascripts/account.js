@@ -74,6 +74,70 @@ function successfulLogin() {
             console.log(googleUser)
         }
     }
+    
+    gapi.load("client:auth2", function() {
+        auth2 = gapi.auth2.init({
+            client_id: "813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com",
+            'scope': 'profile'
+        }).then(function () {
+            var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+            try{
+                isLoggedIn = true
+                if(googleUser != undefined){
+                    let profile = googleUser.getBasicProfile();
+                    var given_name = profile.getName();
+                    var family_name = profile.getFamilyName();
+                    given_name = given_name.replace(family_name, "")
+                    console.log("Name: ")
+                    console.log(given_name);
+                    console.log(family_name);
+
+                    $.get("/getPatientAppointments?family_name=" + family_name + "&given_name=" + given_name, appointments => {
+                        console.log(appointments);
+                        appointments.forEach(appointment => {
+                            var doctor_name = appointment.family_name + " " + appointment.given_name;
+                            var date = appointment.date;
+                            date = date.split("T");
+                            var day = date[0];
+                            var time = date[1];
+                            var table = document.getElementById("AppointmentsTable");
+                            var row = table.insertRow(1);
+                            var cell_name = row.insertCell(0);
+                            var cell_day = row.insertCell(1);
+                            var cell_time = row.insertCell(2);
+                            cell_name.innerHTML = doctor_name;
+                            cell_day.innerHTML = day;
+                            cell_time.innerHTML = time.substring(0, 5);
+                        })
+                    })
+
+                    $.get("/getPatientPrescriptions?family_name=" + family_name + "&given_name=" + given_name, prescriptions => {
+                        console.log(prescriptions);
+                        prescriptions.forEach(prescription => {
+                            var doctor_name = prescription.family_name + " " + prescription.given_name;
+                            var start_date = prescription.start_date.split("T")[0];
+                            var end_date = prescription.end_date.split("T")[0];
+                            var interval = prescription.minutes_interval;
+                            var table = document.getElementById("PrescriptionsTable");
+                            var row = table.insertRow(1);
+                            var cell_name = row.insertCell(0);
+                            var cell_start = row.insertCell(1);
+                            var cell_end = row.insertCell(2);
+                            var cell_interval = row.insertCell(3);
+                            cell_name.innerHTML = doctor_name;
+                            cell_start.innerHTML = start_date;
+                            cell_end.innerHTML = end_date;
+                            cell_interval.innerHTML = interval;
+                        })
+                    })
+                    
+                }
+            }
+            catch(err) {
+                isLoggedIn = false
+            }
+        })
+    });
 }
 
 function signOut() {
