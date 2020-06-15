@@ -213,7 +213,37 @@ app.get('/', (req, res) => {
     res.render('createRoom', { rooms: rooms })
 })
 
+app.get("/getPatientAppointments", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    console.log(family_name);
+    console.log(given_name);
+    pool.query("call get_patient_appointments(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
 
+app.get("/getPatientPrescriptions", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    console.log(family_name);
+    console.log(given_name);
+    pool.query("call get_patient_prescriptions(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
 
 app.get("/getAllHospitals", async function(req, res) {
     pool.query("CALL get_hospitals_list();", (err, results, fields) => {
