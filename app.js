@@ -251,6 +251,34 @@ app.get("/getPatientPrescriptions", (req, res) => {
     })
 })
 
+app.get("/getDoctorAppointments", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    pool.query("call get_doctor_appointments(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
+
+app.get("/getdoctorPrescriptions", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    pool.query("call get_doctor_prescriptions(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
+
 app.get("/getAllHospitals", async function(req, res) {
     pool.query("CALL get_hospitals_list();", (err, results, fields) => {
         if (err) {
