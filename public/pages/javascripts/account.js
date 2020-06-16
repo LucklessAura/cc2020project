@@ -91,44 +91,166 @@ function successfulLogin() {
                     console.log("Name: ")
                     console.log(given_name);
                     console.log(family_name);
-
-                    $.get("/getPatientAppointments?family_name=" + family_name + "&given_name=" + given_name, appointments => {
-                        console.log(appointments);
-                        appointments.forEach(appointment => {
-                            var doctor_name = appointment.family_name + " " + appointment.given_name;
-                            var date = appointment.date;
-                            date = date.split("T");
-                            var day = date[0];
-                            var time = date[1];
+                    if (document.cookie.includes("userType=Doctor")) {
+                        console.log("Doctor");
+                        $.get("/getDoctorAppointments?family_name=" + family_name + "&given_name=" + given_name, appointments => {
+                            console.log(appointments);
                             var table = document.getElementById("AppointmentsTable");
-                            var row = table.insertRow(1);
-                            var cell_name = row.insertCell(0);
-                            var cell_day = row.insertCell(1);
-                            var cell_time = row.insertCell(2);
-                            cell_name.innerHTML = doctor_name;
-                            cell_day.innerHTML = day;
-                            cell_time.innerHTML = time.substring(0, 5);
+                            var row = table.insertRow(0);
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+                            cell1.innerHTML = "Patient";
+                            cell2.innerHTML = "Date";
+                            cell3.innerHTML = "Time";
+                            if (appointments.length == 0){
+                                var table = document.getElementById("AppointmentsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_day = row.insertCell(1);
+                                var cell_time = row.insertCell(2);
+                                cell_name.innerHTML = "None";
+                                cell_day.innerHTML = "";
+                                cell_time.innerHTML = "";
+                            }
+                            appointments.forEach(appointment => {
+                                var patient_name = appointment.family_name + " " + appointment.given_name;
+                                var date = appointment.date;
+                                date = date.split("T");
+                                var day = date[0];
+                                var time = date[1];
+                                var table = document.getElementById("AppointmentsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_day = row.insertCell(1);
+                                var cell_time = row.insertCell(2);
+                                cell_name.innerHTML = patient_name;
+                                cell_day.innerHTML = day;
+                                cell_time.innerHTML = time.substring(0, 5);
+                            })
                         })
-                    })
-                    $.get("/getPatientPrescriptions?family_name=" + family_name + "&given_name=" + given_name, prescriptions => {
-                        console.log(prescriptions);
-                        prescriptions.forEach(prescription => {
-                            var doctor_name = prescription.family_name + " " + prescription.given_name;
-                            var start_date = prescription.start_date.split("T")[0];
-                            var end_date = prescription.end_date.split("T")[0];
-                            var interval = prescription.minutes_interval;
+                        $.get("/getDoctorPrescriptions?family_name=" + family_name + "&given_name=" + given_name, prescriptions => {
+                            console.log(prescriptions);
                             var table = document.getElementById("PrescriptionsTable");
-                            var row = table.insertRow(1);
-                            var cell_name = row.insertCell(0);
-                            var cell_start = row.insertCell(1);
-                            var cell_end = row.insertCell(2);
-                            var cell_interval = row.insertCell(3);
-                            cell_name.innerHTML = doctor_name;
-                            cell_start.innerHTML = start_date;
-                            cell_end.innerHTML = end_date;
-                            cell_interval.innerHTML = interval;
+                            var row = table.insertRow(0);
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+                            var cell4 = row.insertCell(3);
+                            cell1.innerHTML = "Patient";
+                            cell2.innerHTML = "Start";
+                            cell3.innerHTML = "End";
+                            cell4.innerHTML = "Interval";
+                            if(prescriptions.length == 0) {
+                                var table = document.getElementById("PrescriptionsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_start = row.insertCell(1);
+                                var cell_end = row.insertCell(2);
+                                var cell_interval = row.insertCell(3);
+                                cell_name.innerHTML = "None";
+                                cell_start.innerHTML = "";
+                                cell_end.innerHTML = "";
+                                cell_interval.innerHTML = "";
+                            }
+                            prescriptions.forEach(prescription => {
+                                var patient_name = prescription.family_name + " " + prescription.given_name;
+                                var start_date = prescription.start_date.split("T")[0];
+                                var end_date = prescription.end_date.split("T")[0];
+                                var interval = prescription.minutes_interval;
+                                var table = document.getElementById("PrescriptionsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_start = row.insertCell(1);
+                                var cell_end = row.insertCell(2);
+                                var cell_interval = row.insertCell(3);
+                                cell_name.innerHTML = patient_name;
+                                cell_start.innerHTML = start_date;
+                                cell_end.innerHTML = end_date;
+                                cell_interval.innerHTML = interval;
+                            })
                         })
-                    })
+
+                    }else{
+                        console.log("Patient");
+                        $.get("/getPatientAppointments?family_name=" + family_name + "&given_name=" + given_name, appointments => {
+                            console.log(appointments);
+                            var table = document.getElementById("AppointmentsTable");
+                            var row = table.insertRow(0);
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+                            cell1.innerHTML = "Doctor";
+                            cell2.innerHTML = "Date";
+                            cell3.innerHTML = "Time";
+                            if (appointments.length == 0){
+                                var table = document.getElementById("AppointmentsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_day = row.insertCell(1);
+                                var cell_time = row.insertCell(2);
+                                cell_name.innerHTML = "None";
+                                cell_day.innerHTML = "";
+                                cell_time.innerHTML = "";
+                            }
+                            appointments.forEach(appointment => {
+                                var doctor_name = appointment.family_name + " " + appointment.given_name;
+                                var date = appointment.date;
+                                date = date.split("T");
+                                var day = date[0];
+                                var time = date[1];
+                                var table = document.getElementById("AppointmentsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_day = row.insertCell(1);
+                                var cell_time = row.insertCell(2);
+                                cell_name.innerHTML = doctor_name;
+                                cell_day.innerHTML = day;
+                                cell_time.innerHTML = time.substring(0, 5);
+                            })
+                        })
+                        $.get("/getPatientPrescriptions?family_name=" + family_name + "&given_name=" + given_name, prescriptions => {
+                            console.log(prescriptions);
+                            var table = document.getElementById("PrescriptionsTable");
+                            var row = table.insertRow(0);
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+                            var cell4 = row.insertCell(3);
+                            cell1.innerHTML = "Doctor";
+                            cell2.innerHTML = "Start";
+                            cell3.innerHTML = "End";
+                            cell4.innerHTML = "Interval";
+                            if (prescriptions.length == 0){
+                                var table = document.getElementById("PrescriptionsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_start = row.insertCell(1);
+                                var cell_end = row.insertCell(2);
+                                var cell_interval = row.insertCell(3);
+                                cell_name.innerHTML = "None";
+                                cell_start.innerHTML = "";
+                                cell_end.innerHTML = "";
+                                cell_interval.innerHTML = "";
+                            }
+                            prescriptions.forEach(prescription => {
+                                var doctor_name = prescription.family_name + " " + prescription.given_name;
+                                var start_date = prescription.start_date.split("T")[0];
+                                var end_date = prescription.end_date.split("T")[0];
+                                var interval = prescription.minutes_interval;
+                                var table = document.getElementById("PrescriptionsTable");
+                                var row = table.insertRow(1);
+                                var cell_name = row.insertCell(0);
+                                var cell_start = row.insertCell(1);
+                                var cell_end = row.insertCell(2);
+                                var cell_interval = row.insertCell(3);
+                                cell_name.innerHTML = doctor_name;
+                                cell_start.innerHTML = start_date;
+                                cell_end.innerHTML = end_date;
+                                cell_interval.innerHTML = interval;
+                            })
+                        })    
+                    }
 
                 }
             } catch (err) {
@@ -137,6 +259,7 @@ function successfulLogin() {
         })
     });
 }
+
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
