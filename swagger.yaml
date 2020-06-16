@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: defaultTitle
-  description: defaultDescription
+  title: Doctronic
+  description: internal API endpoints used in the project
   version: "1.0"
 servers:
   - url: 'https://cc2020project.appspot.com'
@@ -35,11 +35,6 @@ paths:
           schema:
             type: string
           example: balan
-        - name: code
-          in: header
-          schema:
-            type: string
-          example: SV
       responses:
         '200':
           description: Auto generated using Swagger Inspector
@@ -66,11 +61,6 @@ paths:
           schema:
             type: string
           example: balan
-        - name: code
-          in: header
-          schema:
-            type: string
-          example: SV
       responses:
         '200':
           description: Auto generated using Swagger Inspector
@@ -98,7 +88,7 @@ paths:
         - url: 'https://cc2020project.appspot.com'
     servers:
       - url: 'https://cc2020project.appspot.com'
-  /getHospitals.html:
+  /getHospitals:
     get:
       description: Auto generated using Swagger Inspector
       parameters:
@@ -119,15 +109,16 @@ paths:
         - url: 'https://cc2020project.appspot.com'
     servers:
       - url: 'https://cc2020project.appspot.com'
-  /getDoctors/Spitalul Municipal Sf. Doctori Cosma si Damian Radauti:
+  /getDoctors/:
     get:
       description: Auto generated using Swagger Inspector
       parameters:
-        - name: code
-          in: header
+        - name: Hospital Name
+          in: path
+          required: true
           schema:
             type: string
-          example: SV
+          example: {}
       responses:
         '200':
           description: Auto generated using Swagger Inspector
