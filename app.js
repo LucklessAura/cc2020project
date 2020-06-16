@@ -4,6 +4,13 @@ const session = require('express-session')
 const { OAuth2Client } = require('google-auth-library');
 
 var app = express();
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
 app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -89,8 +96,7 @@ async function cleanUpRooms() {
 }
 
 
-app.get("/getHospitals.html", function(req, res) {
-    let code = "IS";
+app.get("/getHospitals", function(req, res) {
     code = req.get('code');
     const da = pool.query('SELECT name from hospitals where hospitals.city_code = \"' + code + '\";');
     da.then(resp => {
@@ -461,7 +467,7 @@ function getUserRooms(socket) {
 }
 
 
-app.post("/login.html", async function(req, res) {
+app.post("/login", async function(req, res) {
     var received = req.body
     var client = new OAuth2Client("813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6");
     //console.log(user.id_token);
@@ -563,7 +569,7 @@ app.post("/login.html", async function(req, res) {
 })
 
 
-app.post("/logout.html", function(req, res) {
+app.post("/logout", function(req, res) {
     req.session.destroy(function() {
         console.log("Logged Out");
     });

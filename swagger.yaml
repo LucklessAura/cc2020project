@@ -1,0 +1,165 @@
+openapi: 3.0.1
+info:
+  title: defaultTitle
+  description: defaultDescription
+  version: "1.0"
+servers:
+  - url: 'https://cc2020project.appspot.com'
+paths:
+  /getAllHospitals:
+    get:
+      description: Auto generated using Swagger Inspector
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getPatientAppointments:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: given_name
+          in: query
+          schema:
+            type: string
+          example: ioana
+        - name: family_name
+          in: query
+          schema:
+            type: string
+          example: balan
+        - name: code
+          in: header
+          schema:
+            type: string
+          example: SV
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getPatientPrescriptions:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: given_name
+          in: query
+          schema:
+            type: string
+          example: ioana
+        - name: family_name
+          in: query
+          schema:
+            type: string
+          example: balan
+        - name: code
+          in: header
+          schema:
+            type: string
+          example: SV
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /logout:
+    post:
+      description: Auto generated using Swagger Inspector
+      responses:
+        '404':
+          description: Auto generated using Swagger Inspector
+          content:
+            text/html; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getHospitals.html:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: code
+          in: header
+          schema:
+            type: string
+          example: SV
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            text/html; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getDoctors/Spitalul Municipal Sf. Doctori Cosma si Damian Radauti:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: code
+          in: header
+          schema:
+            type: string
+          example: SV
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /login/:
+    post:
+      description: Auto generated using Swagger Inspector
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              type: string
+            examples:
+              '0':
+                value: |-
+                  var user = {
+                          id_token: id_token,
+                          userType: userType,
+                          createAccount: checked,
+                      }
+      responses:
+        default:
+          description: Auto generated using Swagger Inspector
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'

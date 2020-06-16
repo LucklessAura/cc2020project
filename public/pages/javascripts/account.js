@@ -49,7 +49,7 @@ function successfulLogin() {
                 }
             }
         }
-        req.open("POST", "/login.html", true);
+        req.open("POST", "/login", true);
         req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         req.send(JSON.stringify(user));
 
@@ -74,16 +74,16 @@ function successfulLogin() {
             console.log(googleUser)
         }
     }
-    
+
     gapi.load("client:auth2", function() {
         auth2 = gapi.auth2.init({
             client_id: "813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com",
             'scope': 'profile'
-        }).then(function () {
+        }).then(function() {
             var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
-            try{
+            try {
                 isLoggedIn = true
-                if(googleUser != undefined){
+                if (googleUser != undefined) {
                     let profile = googleUser.getBasicProfile();
                     var given_name = profile.getName();
                     var family_name = profile.getFamilyName();
@@ -110,7 +110,6 @@ function successfulLogin() {
                             cell_time.innerHTML = time.substring(0, 5);
                         })
                     })
-
                     $.get("/getPatientPrescriptions?family_name=" + family_name + "&given_name=" + given_name, prescriptions => {
                         console.log(prescriptions);
                         prescriptions.forEach(prescription => {
@@ -130,10 +129,9 @@ function successfulLogin() {
                             cell_interval.innerHTML = interval;
                         })
                     })
-                    
+
                 }
-            }
-            catch(err) {
+            } catch (err) {
                 isLoggedIn = false
             }
         })
@@ -144,7 +142,7 @@ function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut();
     req = new XMLHttpRequest();
-    req.open("POST", "/logout.html", true);
+    req.open("POST", "/logout", true);
     req.send();
     document.cookie = "LoggedIn=False";
     document.cookie = "userType=None";
