@@ -1,0 +1,72 @@
+<html>
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" media="(min-width:1000px)" href="stylesheets/style.css">
+    <link rel="stylesheet" media="(max-width: 999px)" href="stylesheets/lowRez.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sen&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="javascripts/account.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="javascripts/appointment.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+</head>
+
+<body class="Account">
+    <nav class="navbar">
+        <a href="index.html">Acasa</a>
+        <a href="account.html">Cont</a>
+        <a href="map.html">Harta</a>
+        <a href="appointment.html">Programari</a>
+    </nav>
+    <main>
+        <section id="notLogged">
+            <h2>Nu esti autentificat inca</h2>
+
+            <div>
+                <p id="TypeP">Autentifica-te ca: </p>
+                <select name="type" id="type" onchange="SelectChanged()">
+                    <option value = "Doctor">Doctor</option>
+                    <option value = "Pacient">Pacient</option>
+                </select>
+            </div>
+
+            <section class="LogIn">
+                <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
+                <div class="g-signin2" data-onsuccess="successfulLogin">
+            </section>
+            <p class="error"></p>
+            <div id="createAccount">
+                <label for="CreateAccount">Creeaza-mi un cont pe Doctronic automat daca nu am deja</label>
+                <input type="checkbox" Name="CreateAccount" id="CreateAccountCheckbox">
+            </div>
+
+        </section>
+        <section id="LoggedIn">
+            <img id="UserImage" />
+            <p id="UserName"></p>
+            <button onclick="signOut()">Deautentificare</button>
+           
+            <br><br><br>
+            <p>Your prescriptions:</p>
+            <table id="PrescriptionsTable"></table>
+            <br>
+            <p>Your appointments:</p>
+            <table id ="AppointmentsTable"></table>     
+            
+        </section>
+
+        <script>
+            SelectChanged();
+        </script>
+    </main>
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,361 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 99vw;
+    background-color: #EFEFEF;
+    overflow: auto;
+}
+
+* {
+    font-family: Sen;
+    color: black;
+}
+
+section.HospitalLists {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    position: relative;
+    top: 10vh;
+}
+
+section.maps {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+div#map {
+    height: 85vh;
+    width: 100vw;
+    display: block;
+    flex-shrink: 0;
+}
+
+div#directionsPanel {
+    width: 100%;
+    overflow: auto;
+    flex-shrink: 0;
+    height: auto;
+}
+
+main.MapPage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    top: 10vh;
+    position: relative;
+}
+
+table.Table {
+    width: 100vw;
+    overflow: auto;
+}
+
+table.Table>thead {
+    height: 20%;
+}
+
+table.Table>tbody {
+    height: 80%;
+}
+
+table.Table>thead>tr>th {
+    width: auto;
+    height: 15vh;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 2px solid rgba(68, 68, 68, 0.5);
+    font-family: Sen;
+    font-weight: 400;
+    font-size: 1.1em;
+}
+
+table td {
+    height: 7vh;
+}
+
+table>tbody>tr>td {
+    width: auto;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+    font-family: Sen;
+    font-weight: 400;
+    font-size: 0.9em;
+}
+
+table>tbody>tr>td:hover {
+    background-color: #FF3B3F;
+    cursor: pointer;
+}
+
+select#mode {
+    width: 50vw;
+    border-radius: 5px;
+}
+
+.navbar {
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 8vh;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 0px;
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+}
+
+.navbar>a {
+    display: block;
+    text-align: center;
+    background-color: #A9A9A9;
+    width: 100%;
+    padding: 2vh;
+    border: 1px solid black;
+    text-decoration: none;
+}
+
+.navbar>a:active {
+    text-decoration: none;
+}
+
+.navbar>a:visited {
+    text-decoration: none;
+}
+
+.navbar>a:hover {
+    background-color: #FF3B3F;
+    ;
+}
+
+*::selection {
+    background-color: #CAEBF2;
+}
+
+.indexBody main {
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: center;
+    width: 100vw;
+    flex-direction: column;
+    height: max-content;
+}
+
+.indexBody main section.Main {
+    position: relative;
+    top: 20vh;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    width: 100vw;
+    height: 30vh;
+    flex-direction: column;
+}
+
+.indexBody main>section>h1.title {
+    top: 2vh;
+    width: 100vw;
+    text-align: center;
+    font-size: 3em;
+}
+
+.indexBody main>section>p {
+    width: 100vw;
+    text-align: center;
+    font-size: 1em;
+    margin: 0px;
+    padding: 0px;
+}
+
+section.NewsSection {
+    position: relative;
+    top: 10vh;
+    height: 470vh;
+}
+
+iframe {
+    width: 100%;
+    border: 0px;
+    height: 100%;
+}
+
+img#UserImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+section#LoggedIn {
+    display: none;
+}
+
+body.Account main {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    top: 20vh;
+    height: auto;
+    overflow: auto;
+}
+
+body.Account main>section#NotLogged {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 50vh;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+#TypeP {
+    display: inline;
+    font-size: 1.1em;
+}
+
+#createAccount {
+    display: none;
+}
+
+.error {
+    display: inline;
+    font-size: 1.1em;
+    color: rgb(207, 7, 7);
+}
+
+#UserName {
+    display: inline;
+    font-size: 1.3em;
+    color: black;
+}
+
+section#LoggedIn {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 98vw;
+    height: auto;
+}
+
+.cell {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: auto;
+    width: 75%;
+    text-align: center;
+    font-size: 1.1em;
+    justify-content: center;
+    overflow: auto;
+    background-color: rgb(228, 227, 227);
+    margin-left: 12.5%;
+}
+
+.chatbox {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: auto;
+    width: 100%;
+    font-size: 20px;
+    justify-content: space-around;
+    overflow: auto;
+    background-color: rgb(228, 227, 227);
+    position: relative;
+    align-items: center;
+}
+
+#message-container {
+    top: 10vh;
+    overflow: auto;
+    border-style: solid;
+    height: 60%;
+    border-radius: 1%;
+    border-color: black;
+    width: 90%;
+    position: relative;
+}
+
+#send-container {
+    display: flex;
+    width: 80%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+#send-container button {
+    width: 20vh;
+    margin: 0px;
+    padding: 0px;
+    height: 10vh;
+    border: 0px;
+}
+
+#send-container textarea {
+    width: 90vw;
+    height: 10vh;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+}
+
+#make-appointment {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#make-appointment input {
+    margin-left: 40%;
+    margin-bottom: 1%;
+    width: 20%;
+}
+
+#submit-button {
+    width: fit-content;
+    font-size: 1.1em;
+}
+
+.loader {
+    align-self: center;
+    border: 10px solid #f3f3f3;
+    /* Light grey */
+    border-top: 10px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,156 @@
+openapi: 3.0.1
+info:
+  title: Doctronic
+  description: internal API endpoints used in the project
+  version: "1.0"
+servers:
+  - url: 'https://cc2020project.appspot.com'
+paths:
+  /getAllHospitals:
+    get:
+      description: Auto generated using Swagger Inspector
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getPatientAppointments:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: given_name
+          in: query
+          schema:
+            type: string
+          example: ioana
+        - name: family_name
+          in: query
+          schema:
+            type: string
+          example: balan
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getPatientPrescriptions:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: given_name
+          in: query
+          schema:
+            type: string
+          example: ioana
+        - name: family_name
+          in: query
+          schema:
+            type: string
+          example: balan
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /logout:
+    post:
+      description: Auto generated using Swagger Inspector
+      responses:
+        '404':
+          description: Auto generated using Swagger Inspector
+          content:
+            text/html; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getHospitals:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: code
+          in: header
+          schema:
+            type: string
+          example: SV
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            text/html; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /getDoctors/:
+    get:
+      description: Auto generated using Swagger Inspector
+      parameters:
+        - name: Hospital Name
+          in: path
+          required: true
+          schema:
+            type: string
+          example: {}
+      responses:
+        '200':
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'
+  /login/:
+    post:
+      description: Auto generated using Swagger Inspector
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              type: string
+            examples:
+              '0':
+                value: |-
+                  var user = {
+                          id_token: id_token,
+                          userType: userType,
+                          createAccount: checked,
+                      }
+      responses:
+        default:
+          description: Auto generated using Swagger Inspector
+      servers:
+        - url: 'https://cc2020project.appspot.com'
+    servers:
+      - url: 'https://cc2020project.appspot.com'

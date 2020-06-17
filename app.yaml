@@ -1,1 +1,3 @@
 runtime: nodejs10
+network:
+  session_affinity: true

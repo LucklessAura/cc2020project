@@ -1,0 +1,184 @@
+<html>
+<script>
+    function logincheck(){
+        if(sessionStorage.getItem("name") == null){
+            location.replace("./login.html");
+        }
+    }
+    logincheck();
+</script>
+<head>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script  src="/socket.io/socket.io.js"></script>
+    <script src="javascripts/appointment.js"></script>
+    <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
+    <link rel='stylesheet', href='stylesheets/changeData.css'>
+    <link rel='stylesheet', href='stylesheets/style.css'>
+</head>
+<script>
+
+</script>
+
+
+<body>
+
+    <nav class="navbar">
+        <a href="index.html">Acasa</a>
+        <a href="account.html">Cont</a>
+        <a href="map.html">Harta</a>
+        <a href="appointment.html">Programari</a>
+    </nav>
+    <h1>Modifica Datele</h1>
+    <form action="" id='pa_form' onsubmit="changeData()">
+        <label for="">Numar de Telefon Nou</label>
+        <input type="text" name="tel" id="tel">
+        <label for="">E-mail Nou</label>
+        <input type="email" id="mail">
+        <input type="submit" value="Salveaza Modificarile">
+    </form>
+
+    <form action="#" id='doc_form' onsubmit="changeData()">
+        <label for="">Numar de Telefon Nou</label>
+        <input type="text" name="tel" id="doc_tel">
+        <label for="">E-mail Nou</label>
+        <input type="email" id="doc_mail">
+        <label for="">Specializare noua</label>
+        <input type="text" id="special">
+        <input type="submit" value="Salveaza Modificarile">
+
+    </form>
+
+    </div>
+   </body>
+
+   <script>
+        var doc_info = document.getElementById('doc_form');
+        var pac_info = document.getElementById('pa_form');
+        if(sessionStorage.getItem("rol") == 'doctor'){
+            pac_info.style.visibility = "hidden";
+            pac_info.style.position = "absolute";
+        }else{
+            doc_form.style.visibility = "hidden";
+            doc_form.style.position = "absolute";
+        }
+
+        function changeData(){
+            if(sessionStorage.getItem("rol") == 'doctor'){
+                var first_name = sessionStorage.getItem("name").split(" ")[0];
+                var last_name = sessionStorage.getItem("name").split(" ")[1]
+                console.log(first_name);
+                console.log(last_name);
+                var email = document.getElementById('doc_mail').value;
+                var rol = sessionStorage.getItem("rol");
+                var resp = "";
+                userInfoRequest = new XMLHttpRequest();
+
+                userInfoRequest.open("GET", "https://cc2020project.appspot.com/getUser.html", false);
+                userInfoRequest.setRequestHeader("first_name", first_name);
+                userInfoRequest.setRequestHeader("last_name", last_name);
+                userInfoRequest.setRequestHeader("rol",rol);
+                userInfoRequest.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+
+                        console.log("got a responce = "+ this.response);
+                        resp =  JSON.parse(this.response);
+                        console.log(resp);
+                    }
+
+                }
+                console.log("making request");
+                userInfoRequest.send();
+
+                if(email == "")
+                    email = sessionStorage.getItem("email");
+                var tel = document.getElementById('doc_tel').value;
+                if(tel =="")
+                {
+                    console.log("making request");
+                    tel = resp['phone_number'];
+
+                }
+                var special = document.getElementById('special').value;
+                if (special == "")
+                {
+                    special = resp['speciality'];
+                }
+
+                updateInfoRequest = new XMLHttpRequest();
+
+                updateInfoRequest.open("GET", "https://cc2020project.appspot.com/updateInfo.html", false);
+                updateInfoRequest.setRequestHeader("first_name", first_name);
+                updateInfoRequest.setRequestHeader("last_name", last_name);
+                updateInfoRequest.setRequestHeader("rol",rol);
+                updateInfoRequest.setRequestHeader("tel",tel);
+                updateInfoRequest.setRequestHeader("email",email);
+                updateInfoRequest.setRequestHeader("special",special);
+                updateInfoRequest.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("got a responce = "+ this.response);
+                    }
+
+                }
+                console.log("making request");
+                console.log(special)
+                updateInfoRequest.send();
+            }else{
+                var first_name = sessionStorage.getItem("name").split(" ")[0];
+                var last_name = sessionStorage.getItem("name").split(" ")[1]
+                console.log(first_name);
+                console.log(last_name);
+                var email = document.getElementById('mail').value;
+                var rol = sessionStorage.getItem("rol");
+                var resp = "";
+                userInfoRequest = new XMLHttpRequest();
+
+                userInfoRequest.open("GET", "https://cc2020project.appspot.com/getUser.html", false);
+                userInfoRequest.setRequestHeader("first_name", first_name);
+                userInfoRequest.setRequestHeader("last_name", last_name);
+                userInfoRequest.setRequestHeader("rol",rol);
+                userInfoRequest.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+
+                        console.log("got a responce = "+ this.response);
+                        resp =  JSON.parse(this.response);
+                        console.log(resp);
+                    }
+
+                }
+                console.log("making request");
+                userInfoRequest.send();
+
+                if(email == "")
+                    email = sessionStorage.getItem("email");
+                var tel = document.getElementById('tel').value;
+                if(tel =="")
+                {
+                    console.log("making request");
+                    tel = resp['phone_number'];
+
+                }
+
+                updateInfoRequest = new XMLHttpRequest();
+
+                updateInfoRequest.open("GET", "https://cc2020project.appspot.com/updateInfo.html", false);
+                updateInfoRequest.setRequestHeader("first_name", first_name);
+                updateInfoRequest.setRequestHeader("last_name", last_name);
+                updateInfoRequest.setRequestHeader("rol",rol);
+                updateInfoRequest.setRequestHeader("tel",tel);
+                updateInfoRequest.setRequestHeader("email",email);
+                updateInfoRequest.setRequestHeader("special",special);
+                updateInfoRequest.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("got a responce = "+ this.response);
+                    }
+
+                }
+                console.log("making request");
+                console.log(special)
+                updateInfoRequest.send();
+            }
+            location.replace('./account.html');
+        }
+   </script>
+   </html>

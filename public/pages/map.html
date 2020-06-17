@@ -3,94 +3,60 @@
 <head>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLMI60gh3A2gk8NGXtsB8_HUymue0ERpU&callback=initMap" async defer></script>
-
+    <link rel="stylesheet" media="(min-width:1000px)" href="stylesheets/style.css">
+    <link rel="stylesheet" media="(max-width: 999px)" href="stylesheets/lowRez.css">
+    <script src="javascripts/map.js" type="text/javascript"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLMI60gh3A2gk8NGXtsB8_HUymue0ERpU&libraries=places&callback=initMap" async defer></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="javascripts/appointment.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sen&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div id="map"></div>
-    <script>
-        var map;
-        var destMarker;
-        var origin;
-        var destination;
-        var directionRenderer;
-        var directionService;
+    <nav class="navbar">
+        <a href="index.html">Acasa</a>
+        <a href="account.html">Cont</a>
+        <a href="map.html">Harta</a>
+        <a href="appointment.html">Programari</a>
+    </nav>
+    <main class="MapPage">
+        <section class="maps">
+            <select id="mode" onchange="GetDirections()">
+                <option value="DRIVING">Cu Masina</option>
+                <option value="WALKING">Pe jos</option>
+                <option value="BICYCLING">Cu Bicicleta</option>
+                <option value="TRANSIT">Transport in comun</option>
+            </select>
+            <div id="map"></div>
+            <div id="directionsPanel"></div>
+        </section>
 
-        function initMap() {
-
-            map = new google.maps.Map(document.getElementById('map'), {
-
-                center: {
-                    lat: 44.437,
-                    lng: 26.024
-                },
-                zoom: 7
-            });
-            directionService = new google.maps.DirectionsService();
-            directionRenderer = new google.maps.DirectionsRenderer();
-            directionRenderer.setMap(map);
-            directionRenderer.setPanel(document.getElementById('directionsPanel'));
-            destMarker = new google.maps.Marker({
-                map: map,
-                animation: google.maps.Animation.DROP
-            });
-
-            map.addListener('click', function(mapsMouseEvent) {
-                destination = mapsMouseEvent.latLng;
-                destMarker.setPosition(destination);
-                destMarker.setAnimation(google.maps.Animation.DROP);
-                let originCoords = new google.maps.LatLng(origin.lat, origin.lng);
-                let destinationCoords = new google.maps.LatLng(destination.lat, destination.lng);
-                console.log(destination);
-                console.log(origin);
-                let request = {
-                    origin: originCoords,
-                    destination: destination,
-                    travelMode: "WALKING"
-                }
-                directionService.route(request, function(result, status) {
-                    if (status == "OK") {
-                        directionRenderer.setDirections(result);
-                    }
-                })
-            });
-        }
-
-
-
-        function callback(response, status) {
-            let res = document.createElement("p");
-            let json = response;
-            res.innerText = JSON.stringify(json["rows"][0]["elements"][0]);
-            document.getElementsByTagName("BODY")[0].appendChild(res);
-        }
-        navigator.geolocation.getCurrentPosition(function(location) {
-            let originLng = location.coords.longitude;
-            let originLat = location.coords.latitude;
-            map.setCenter({
-                lat: originLat,
-                lng: originLng
-            });
-            origin = {
-                lat: originLat,
-                lng: originLng
-            };
-            map.setZoom(14);
-            var selfMarker = new google.maps.Marker({
-                position: {
-                    lat: originLat,
-                    lng: originLng
-                },
-                map: map,
-                animation: google.maps.Animation.DROP
-            });
-        });
-    </script>
-
-    <div id="directionsPanel"></div>
-
+        <section class="HospitalLists">
+            <div class="RegisteredHospitals">
+                <table class="Table">
+                    <thead>
+                        <tr>
+                            <th>Lista spitalelor apropriate partenere</th>
+                        </tr>
+                    </thead>
+                    <tbody class="RegisteredHospitalsBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="UnregisterdHospitals">
+                <table class="Table">
+                    <thead>
+                        <tr>
+                            <th>Lista spitalelor apropriate fara parteneriat</th>
+                        </tr>
+                    </thead>
+                    <tbody class="UnregisterdHospitalsBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
 </body>
 

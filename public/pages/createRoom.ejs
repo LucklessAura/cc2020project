@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Proiect</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://apis.google.com/js/api.js"></script>
+        <script defer src="javascripts/appointment.js"></script>
+    </head>
+    <body>
+        <div id="room-container">
+            <% Object.keys(rooms).forEach(room => {  %>
+                <div><%= room %></div>
+                <a href="/<%= room %>">Join</a>
+            <% }) %>
+        </div>
+        <form action="/room" method="POST">
+            <input name="room" type="text" required>
+            <button type="submit">New Room</button>
+        </form>
+    </body>
+    <script>
+        var socket = io({
+            transports: ['polling']
+        })
+
+        socket.emit('chat message', "l;akshjfdlkasjn")
+        socket.on("chat message", function(msg){
+            console.log(msg);
+        })
+
+        var i = new Date();
+        var j = 1;
+        var a = []
+        while(j < 3){
+            a.push(new Date(i))
+            i.setHours(i.getHours() + 1);
+            j += 1;
+        }
+        console.log(a)
+    </script>
+</html>

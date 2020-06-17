@@ -1,11 +1,39 @@
 <html>
 
 <head>
-
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <script src="https://apis.google.com/js/plus.js?onload=appStart"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6.apps.googleusercontent.com">
+    <link rel="stylesheet" media="(min-width:1000px)" href="stylesheets/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sen&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" media="(max-width: 999px)" href="stylesheets/lowRez.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script defer src="javascripts/appointment.js"></script>
 </head>
 
-<body>
-    <h1>this is index of the app</h1>
+<body class="indexBody">
+
+    <nav class="navbar">
+        <a href="index.html">Acasa</a>
+        <a href="account.html">Cont</a>
+        <a href="map.html">Harta</a>
+        <a href="appointment.html">Programari</a>
+    </nav>
+    <main>
+
+        <section class="Main">
+            <p>Pentru nevoile tale medicale</p>
+            <h1 class="title">Doctronic</h1>
+        </section>
+        <section class="NewsSection">
+            <p>Noutati</p>
+            <iframe class="News" src="https://covid19response.cloud.looker.com/embed/dashboards-next/1?Region=Europe&Country=Romania"> </iframe>
+
+        </section>
+    </main>
 </body>
 
 </html>

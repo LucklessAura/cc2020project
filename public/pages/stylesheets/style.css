@@ -1,0 +1,254 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 99vw;
+    background-color: #EFEFEF;
+}
+
+
+* {
+    font-family: Sen;
+    color: black;
+}
+
+section.HospitalLists {
+    width: 29vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    position: relative;
+    top: 10vh;
+}
+
+section.maps {
+    height: 90vh;
+    width: 70vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+div#map {
+    height: 70%;
+    width: 100%;
+    display: block;
+    flex-shrink: 0;
+}
+
+div#directionsPanel {
+    width: 100%;
+    overflow: auto;
+    flex-shrink: 0;
+}
+
+main.MapPage {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    top: 10vh;
+    position: relative;
+}
+
+table.Table {
+    width: 29vw;
+    overflow: auto;
+}
+
+table.Table>thead {
+    height: 20%;
+}
+
+table.Table>tbody {
+    height: 80%;
+}
+
+table.Table>thead>tr>th {
+    width: auto;
+    height: 15vh;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 2px solid rgba(68, 68, 68, 0.5);
+    font-family: Sen;
+    font-weight: 400;
+    font-size: x-large;
+}
+
+table td {
+    height: 7vh;
+}
+
+table>tbody>tr>td {
+    width: auto;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+    font-family: Sen;
+    font-weight: 400;
+    font-size: large;
+}
+
+table>tbody>tr>td:hover {
+    background-color: #FF3B3F;
+    cursor: pointer;
+}
+
+select#mode {
+    width: 10vw;
+    border-radius: 5px;
+}
+
+.navbar {
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 8vh;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 0px;
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+}
+
+.navbar>a {
+    display: block;
+    text-align: center;
+    background-color: #A9A9A9;
+    width: 100%;
+    padding: 2.8vh;
+    border: 1px solid black;
+    text-decoration: none;
+}
+
+.navbar>a:active {
+    text-decoration: none;
+}
+
+.navbar>a:visited {
+    text-decoration: none;
+}
+
+.navbar>a:hover {
+    background-color: #FF3B3F;
+    ;
+}
+
+*::selection {
+    background-color: #CAEBF2;
+}
+
+.indexBody main {
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: center;
+    width: 100vw;
+    flex-direction: column;
+}
+
+.indexBody main section.Main {
+    position: relative;
+    top: 20vh;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    width: 100vw;
+    height: 30vh;
+    flex-direction: column;
+}
+
+.indexBody main>section>h1.title {
+    top: 2vh;
+    width: 100vw;
+    text-align: center;
+    font-size: 7em;
+}
+
+.indexBody main>section p {
+    top: 1.5vh;
+    width: 100vw;
+    text-align: center;
+    font-size: xx-large;
+    margin: 0px;
+    padding: 0px;
+}
+
+section.NewsSection {
+    position: relative;
+    top: 50vh;
+}
+
+iframe {
+    border: 0px;
+    width: 100vw;
+    height: 200vh;
+}
+
+img#UserImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+section#LoggedIn {
+    display: none;
+}
+
+body.Account main {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    top: 20vh;
+    height: auto;
+    overflow: auto;
+}
+
+body.Account main>section#NotLogged {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 50vh;
+}
+
+h2 {
+    font-size: 5em;
+}
+
+#TypeP {
+    display: inline;
+    font-size: larger;
+}
+
+#createAccount {
+    display: none;
+}
+
+.error {
+    display: inline;
+    font-size: larger;
+    color: rgb(207, 7, 7);
+}
+
+#UserName {
+    display: inline;
+    font-size: 2em;
+    color: black;
+}
+
+section#LoggedIn {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 98vw;
+    height: auto;
+}
