@@ -1,7 +1,13 @@
 var express = require('express');
 const mysql = require('promise-mysql');
 const session = require('express-session')
+const Base64 = require('js-base64')
 const { OAuth2Client } = require('google-auth-library');
+const sendgrid = require('@sendgrid/mail');
+
+
+const URI = "http://localhost:8080/"
+// const URI = "https://cc2020project.appspot.com/"
 
 var app = express();
 app.set('view engine', 'ejs');
@@ -38,8 +44,8 @@ async function initDatabase() {
             user: "root",
             password: "root",
             database: "hospital_db",
-            // socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
-            host: "35.195.74.83",
+            socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
+            // host: "35.195.74.83",
             connectionLimit: 50,
             connectTimeout: 10000,
             acquireTimeout: 10000,
@@ -111,6 +117,7 @@ app.get("/getHospitals.html", function(req, res) {
 
 async function checkAppointments() {
     var date = new Date("2020-06-01T15:13:03.969Z")
+    // var date = new Date()
     var qr = "SELECT d.given_name as doctor_gn, d.family_name as doctor_fn, p.given_name, p.family_name, a.date FROM appointments as a JOIN doctors as d on a.doctor_id = d.id JOIN patients as p on a.patient_id = p.id;"
     pool.query(qr, function(err, results) {
         if (err) {
@@ -147,10 +154,10 @@ async function checkAppointments() {
                                 var patient = result.given_name + " " + result.family_name;
                         }
                     }
-                    // createNewRoom(doctor, patient, result.date);
+                    createNewRoom(doctor, patient, result.date);
                 }
             });
-            createNewRoom("Cristian Tugui", "Anonymous", date)
+            // createNewRoom("Cristian Tugui", "Anonymous", date)
         }
     })
 }
@@ -174,10 +181,75 @@ async function createNewRoom(doctor, patient, time) {
         }
     });
     if (!sentToDoctor) {
+        // sendEmail(doctor, room_name, true)
         setTimeout(function() { secondInviteToRoom(doctor, room_name) }, 10000) // 15 min
     }
     if (!sentToPatient) {
+        // sendEmail(patient, room_name, false)
         setTimeout(function() { secondInviteToRoom(patient, room_name) }, 10000) // 15 min
+    }
+}
+
+async function sendEmail(name, roomName, isDoctor){
+    var split_name = name.split(" ")
+    if(split_name.length > 1){
+        var given_name = split_name[0]
+        var family_name = split_name[1]
+    }
+    else{
+        var given_name = split_name[0]
+        var family_name = ""
+    }
+
+    if(isDoctor){
+        pool.query("SELECT email FROM doctors WHERE given_name = '" + given_name + "' AND family_name = '" + family_name + "';", function(err, results){
+            if(err){
+                console.log("Error retrieving doctor's email.")
+                console.log(err)
+            }
+            else{
+                var emailAddress = results.email;
+                var emailBody = "Buna ziua, dr. " + name + "!\nAveti o programare la aceasta ora pe Doctronic. Pentru a intra va rugam accesati link-ul urmator:\n" + Uri + roomName;
+                var base64EncodedBody = Base64.encodeURI(emailBody);
+                var request = gapi.client.gmail.users.messages.send({
+                    'userId': "cc2020project@appspot.gserviceaccount.com",
+                    'resource': {
+                        'raw': base64EncodedBody
+                    }
+                })
+                console.log("req send")
+            }
+        })
+    }
+    else {
+        pool.query("SELECT email FROM patients WHERE given_name = '" + given_name + "' AND family_name = '" + family_name + "';", async function(err, results){
+            if(err){
+                console.log("Error retrieving patients's email.")
+                console.log(err)
+            }
+            else{
+                var emailAddress = results[0].email;
+                // var emailBody = "Buna ziua, " + name + "!\nAveti o programare la aceasta ora pe Doctronic. Pentru a intra va rugam accesati link-ul urmator:\n" + URI + roomName;
+                // var base64EncodedBody = Base64.encodeURI(emailBody);
+                // var request = gapi.client.gmail.users.messages.send({
+                //     'userId': "cc2020project@appspot.gserviceaccount.com",
+                //     'resource': {
+                //         'raw': base64EncodedBody
+                //     }
+                // })
+                // console.log("req send")
+
+                sendgrid.setApiKey(process.env.SENDGRID_API_KEY || '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');
+
+                await sendgrid.send({
+                    to: emailAddress,
+                    from: 'cc2020project@appspot.gserviceaccount.com',
+                    subject: 'Sendgrid test email from Node.js on Google Cloud Platform',
+                    text:
+                    'Well hello! This is a Sendgrid test email from Node.js on Google Cloud Platform.',
+                });
+            }
+        })
     }
 }
 
@@ -326,7 +398,7 @@ app.post('/finishAppointment', (req, res) => {
                 doctor_lname = doctorSplitName[1]
             }
             else {
-                doctor_fname = "undefined"
+                doctor_fname = ""
                 doctor_lname = doctorSplitName[0]
             }
 
@@ -335,11 +407,10 @@ app.post('/finishAppointment', (req, res) => {
                 patient_lname = patientSplitName[1]
             }
             else {
-                patient_fname = "undefined"
+                patient_fname = ""
                 patient_lname = patientSplitName[0]
             }
-
-            // pool.query("CALL insert_appointment(?,?,?,?,?)", [doctor_lname, doctor_fname, patient_lname, patient_fname, req.body.start])
+            pool.query("CALL insert_appointment(?,?,?,?,?)", [doctor_lname, doctor_fname, patient_lname, patient_fname, req.body.start])
         }
     }
 
