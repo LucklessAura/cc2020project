@@ -11,6 +11,7 @@
     <script src="javascripts/account.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="javascripts/appointment.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
 </head>
 
 <body class="Account">
@@ -47,9 +48,14 @@
             <img id="UserImage" />
             <p id="UserName"></p>
             <button onclick="signOut()">Deautentificare</button>
-            <section id="LoggedMedication">
-            </section>
-            <section id="Appointments"> </section>
+           
+            <br><br><br>
+            <p>Your prescriptions:</p>
+            <table id="PrescriptionsTable"></table>
+            <br>
+            <p>Your appointments:</p>
+            <table id ="AppointmentsTable"></table>     
+            
         </section>
 
         <script>

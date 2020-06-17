@@ -10,6 +10,13 @@ const URI = "http://localhost:8080/"
 // const URI = "https://cc2020project.appspot.com/"
 
 var app = express();
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
 app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -44,8 +51,8 @@ async function initDatabase() {
             user: "root",
             password: "root",
             database: "hospital_db",
-            socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
-            // host: "35.195.74.83",
+            //socketPath: `/cloudsql/cc2020project:europe-west1:cloud-sql-instance`,
+            host: "35.195.74.83",
             connectionLimit: 50,
             connectTimeout: 10000,
             acquireTimeout: 10000,
@@ -67,7 +74,7 @@ async function initDatabase() {
 
 initDatabase().then(function() {
     var nextDate = new Date();
-    if (nextDate.getMinutes() === 0) { 
+    if (nextDate.getMinutes() === 0) {
         checkAppointments()
     } else {
         nextDate.setHours(nextDate.getHours() + 1);
@@ -85,18 +92,17 @@ initDatabase().then(function() {
 
 
 async function cleanUpRooms() {
-    for(const room in rooms) {
-        if( !room.hasOwnProperty('createdAt') || new Date() - rooms[room].createdAt > 3600000){
+    for (const room in rooms) {
+        if (!room.hasOwnProperty('createdAt') || new Date() - rooms[room].createdAt > 3600000) {
             delete rooms[room]
-        } 
+        }
     }
 
     setTimeout(cleanUpRooms, 7200000) // 2 hours
 }
 
 
-app.get("/getHospitals.html", function(req, res) {
-    let code = "IS";
+app.get("/getHospitals", function(req, res) {
     code = req.get('code');
     const da = pool.query('SELECT name from hospitals where hospitals.city_code = \"' + code + '\";');
     da.then(resp => {
@@ -133,25 +139,23 @@ async function checkAppointments() {
                 date.setMinutes(0);
                 date.setMilliseconds(0);
                 if (db_date - date == 0) {
-                    if(result.doctor_gn == "undefined")
+                    if (result.doctor_gn == "undefined")
                         var doctor = result.doctor_fn;
-                    else
-                    {
-                        if(result.doctor_fn == "undefined")
+                    else {
+                        if (result.doctor_fn == "undefined")
                             var doctor = result.doctor_gn;
                         else
                             var doctor = result.doctor_gn + " " + result.doctor_fn;
                     }
 
-                    if(result.given_name == "undefined")
+                    if (result.given_name == "undefined")
                         var patient = result.family_name;
-                    else{
-                            if(result.family_name == "undefined"){
-                                var patient = result.given_name;
-                                console.log(patient)
-                            }
-                            else{
-                                var patient = result.given_name + " " + result.family_name;
+                    else {
+                        if (result.family_name == "undefined") {
+                            var patient = result.given_name;
+                            console.log(patient)
+                        } else {
+                            var patient = result.given_name + " " + result.family_name;
                         }
                     }
                     createNewRoom(doctor, patient, result.date);
@@ -162,13 +166,13 @@ async function checkAppointments() {
     })
 }
 
-async function createNewRoom(doctor, patient, time) { 
+async function createNewRoom(doctor, patient, time) {
     var room_name = hashCode(doctor + patient + time);
 
     rooms[room_name] = { users: {}, createdAt: new Date() }
     var sentToDoctor = false;
     var sentToPatient = false;
-    var i =0
+    var i = 0
     clientsAndSockets.forEach(cs => {
         i += 1
         if (!sentToDoctor && cs.name == doctor) {
@@ -287,7 +291,65 @@ app.get('/', (req, res) => {
     res.render('createRoom', { rooms: rooms })
 })
 
+app.get("/getPatientAppointments", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    console.log(family_name);
+    console.log(given_name);
+    pool.query("call get_patient_appointments(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
 
+app.get("/getPatientPrescriptions", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    console.log(family_name);
+    console.log(given_name);
+    pool.query("call get_patient_prescriptions(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
+
+app.get("/getDoctorAppointments", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    pool.query("call get_doctor_appointments(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
+
+app.get("/getdoctorPrescriptions", (req, res) => {
+    var family_name = req.query.family_name;
+    var given_name = req.query.given_name;
+    pool.query("call get_doctor_prescriptions(?,?);", [family_name, given_name], (err, results, fields) => {
+        if (err) {
+            console.log("Error in retrieving appointments list.");
+            console.log(err);
+        } else {
+            console.log(results[0])
+            res.send(results[0]);
+        }
+    })
+})
 
 app.get("/getAllHospitals", async function(req, res) {
     pool.query("CALL get_hospitals_list();", (err, results, fields) => {
@@ -393,7 +455,7 @@ app.post('/finishAppointment', (req, res) => {
             io.to(clientsAndSockets[i].socket).emit('doctor-add-appointment', { start: req.body.start, end: req.body.end });
             var doctorSplitName = req.body.doctorName.split(" ")
             var patientSplitName = req.body.patientName.split(" ")
-            if(doctorSplitName.length > 1){
+            if (doctorSplitName.length > 1) {
                 doctor_fname = doctorSplitName[0]
                 doctor_lname = doctorSplitName[1]
             }
@@ -402,7 +464,7 @@ app.post('/finishAppointment', (req, res) => {
                 doctor_lname = doctorSplitName[0]
             }
 
-            if(patientSplitName.length > 1){
+            if (patientSplitName.length > 1) {
                 patient_fname = patientSplitName[0]
                 patient_lname = patientSplitName[1]
             }
@@ -426,9 +488,9 @@ io.on('connection', socket => {
         // console.log("New user")
         // console.log(name)
         socket.join(room)
-        // console.log(rooms)
-        // console.log(room)
-        // console.log(socket.id)
+            // console.log(rooms)
+            // console.log(room)
+            // console.log(socket.id)
         rooms[room].users[socket.id] = name
         socket.to(room).broadcast.emit('user-connected', name)
     })
@@ -487,8 +549,8 @@ io.on('connection', socket => {
     socket.on('invite-rejected', data => {
         var roomName = data.roomName
         var memberName = data.memberName
-        
-        setTimeout(function() {secondInviteToRoom(memberName, roomName) }, 5000) // 15 min 900000
+
+        setTimeout(function() { secondInviteToRoom(memberName, roomName) }, 5000) // 15 min 900000
     })
 
     socket.on('invite-rejected-2', data => {
@@ -506,7 +568,7 @@ function getUserRooms(socket) {
 }
 
 
-app.post("/login.html", async function(req, res) {
+app.post("/login", async function(req, res) {
     var received = req.body
     var client = new OAuth2Client("813562380833-v0273o7adbgtedm4s3udrurdiphjpfm6");
     //console.log(user.id_token);
@@ -608,7 +670,7 @@ app.post("/login.html", async function(req, res) {
 })
 
 
-app.post("/logout.html", function(req, res) {
+app.post("/logout", function(req, res) {
     req.session.destroy(function() {
         console.log("Logged Out");
     });
